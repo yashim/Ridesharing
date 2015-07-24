@@ -8,7 +8,7 @@ public class RideSuggestionDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public void createRideSuggestion(RideSuggestion rideSuggestion) {
+    public String createRideSuggestion(RideSuggestion rideSuggestion) {
         ResultSet generatedKeys = null;
         try {
             connection = ConnectionFactory.getConnection();
@@ -22,7 +22,7 @@ public class RideSuggestionDAO {
             preparedStatement.setTimestamp(4, rideSuggestion.getStartTimeMin());
             preparedStatement.setTimestamp(5, rideSuggestion.getStartTimeMax());
             preparedStatement.setInt(6, rideSuggestion.getCapacity());
-            preparedStatement.setInt(7, rideSuggestion.getFreeSeatsNumber());
+            preparedStatement.setInt(7, rideSuggestion.getCapacity());
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating RideSuggestion failed, no rows affected.");
@@ -34,6 +34,7 @@ public class RideSuggestionDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
+        return "OK";
     }
 
     public RideSuggestion getRideSuggestion(String login) throws SQLException {
@@ -48,7 +49,6 @@ public class RideSuggestionDAO {
             rs = preparedStatement.getResultSet();
             rideSuggestion = new RideSuggestion();
             while (rs.next()) {
-                rideSuggestion.setId(rs.getInt("ride_suggestion_id"));
                 rideSuggestion.setUserLogin(rs.getString("user_login"));
                 rideSuggestion.setStartPoint(rs.getString("start_point"));
                 rideSuggestion.setDestinationPoint(rs.getString("destination_point"));
@@ -77,7 +77,6 @@ public class RideSuggestionDAO {
             rs = preparedStatement.getResultSet();
             rideSuggestion = new RideSuggestion();
             while (rs.next()) {
-                rideSuggestion.setId(rs.getInt("ride_suggestion_id"));
                 rideSuggestion.setUserLogin(rs.getString("user_login"));
                 rideSuggestion.setStartPoint(rs.getString("start_point"));
                 rideSuggestion.setDestinationPoint(rs.getString("destination_point"));

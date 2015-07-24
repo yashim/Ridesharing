@@ -3,7 +3,7 @@ CREATE DATABASE ridesharing;
 
 CREATE TABLE ride_suggestions
 (
-  ride_suggestion_id INT PRIMARY KEY NOT NULL,
+  ride_suggestion_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   user_login VARCHAR(255) NOT NULL,
   start_point VARCHAR(255) NOT NULL,
   destination_point VARCHAR(255) NOT NULL,
@@ -14,14 +14,14 @@ CREATE TABLE ride_suggestions
 );
 CREATE TABLE shared_rides
 (
-  shared_ride_id INT PRIMARY KEY NOT NULL,
+  shared_ride_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   ride_suggestion_id INT NOT NULL,
   user_id INT NOT NULL,
   seats_amount INT NOT NULL
 );
 CREATE TABLE users
 (
-  user_id INT PRIMARY KEY NOT NULL,
+  user_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   login VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   first_name VARCHAR(255) NOT NULL,

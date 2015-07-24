@@ -5,7 +5,6 @@ import java.sql.Timestamp;
  * Creation date: 7/24/15.
  */
 public class RideSuggestion {
-    private int id;
     private String userLogin;
     private String startPoint;
     private String destinationPoint;
@@ -17,9 +16,9 @@ public class RideSuggestion {
     public RideSuggestion() {
     }
 
-    public RideSuggestion(int id, String userLogin, String startPoint, String destinationPoint, Timestamp startTimeMin,
+    public RideSuggestion(String userLogin, String startPoint, String destinationPoint, Timestamp startTimeMin,
                           Timestamp startTimeMax, int capacity, int free_seats_number) {
-        this.id = id;
+        //this.id = id;
         this.userLogin = userLogin;
         this.startPoint = startPoint;
         this.destinationPoint = destinationPoint;
@@ -27,14 +26,6 @@ public class RideSuggestion {
         this.startTimeMax = startTimeMax;
         this.capacity = capacity;
         this.freeSeatsNumber = free_seats_number;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getUserLogin() {
