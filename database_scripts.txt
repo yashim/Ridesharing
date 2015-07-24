@@ -1,0 +1,30 @@
+CREATE DATABASE ridesharing;
+
+
+CREATE TABLE ride_suggestions
+(
+  ride_suggestion_id INT PRIMARY KEY NOT NULL,
+  user_login VARCHAR(255) NOT NULL,
+  start_point VARCHAR(255) NOT NULL,
+  destination_point VARCHAR(255) NOT NULL,
+  start_time_min DATETIME NOT NULL,
+  start_time_max DATETIME NOT NULL,
+  capacity INT NOT NULL,
+  free_seats_number INT NOT NULL
+);
+CREATE TABLE shared_rides
+(
+  shared_ride_id INT PRIMARY KEY NOT NULL,
+  ride_suggestion_id INT NOT NULL,
+  user_id INT NOT NULL,
+  seats_amount INT NOT NULL
+);
+CREATE TABLE users
+(
+  user_id INT PRIMARY KEY NOT NULL,
+  login VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  first_name VARCHAR(255) NOT NULL,
+  last_name VARCHAR(255) NOT NULL,
+  phone VARCHAR(20)
+);
