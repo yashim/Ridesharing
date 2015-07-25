@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: shim.
@@ -82,13 +84,7 @@ public class RideSuggestionDAO {
             rs = preparedStatement.getResultSet();
             rideSuggestion = new RideSuggestion();
             while (rs.next()) {
-                rideSuggestion.setUserLogin(rs.getString("user_login"));
-                rideSuggestion.setStartPoint(rs.getString("start_point"));
-                rideSuggestion.setDestinationPoint(rs.getString("destination_point"));
-                rideSuggestion.setStartTimeMin(rs.getTimestamp("start_time_min"));
-                rideSuggestion.setStartTimeMax(rs.getTimestamp("start_time_max"));
-                rideSuggestion.setCapacity(rs.getInt("capacity"));
-                rideSuggestion.setFreeSeatsNumber(rs.getInt("free_seats_number"));
+                rideSuggestion = convertResultSetToRideSuggestion(rs);
             }
         } finally {
             DbUtil.close(rs);
@@ -121,6 +117,82 @@ public class RideSuggestionDAO {
         preparedStatement.execute();
     }
 
-    //TODO delete
+    public void delete(int id) throws SQLException {
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("DELETE FROM ride_suggestions where ride_suggestion_id=?");
+            preparedStatement.setInt(1, id);
+            preparedStatement.execute();
+        }
+        finally {
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+    }
 
+    public List<RideSuggestion> getRideSuggestions(String login) {
+        ResultSet rs = null;
+
+        List<RideSuggestion> reviewList = new ArrayList<RideSuggestion>();
+        try {
+            connection = ConnectionFactory.getConnection();
+            //todo add check for ride time
+            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions where user_login=?");
+            preparedStatement.setString(1, login);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+
+            while (rs.next()) {
+                RideSuggestion review = convertResultSetToRideSuggestion(rs);
+                reviewList.add(review);
+            }
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return reviewList;
+    }
+    private RideSuggestion convertResultSetToRideSuggestion(ResultSet rs) throws SQLException{
+        RideSuggestion rideSuggestion = new RideSuggestion();
+        rideSuggestion.setUserLogin(rs.getString("user_login"));
+        rideSuggestion.setStartPoint(rs.getString("start_point"));
+        rideSuggestion.setDestinationPoint(rs.getString("destination_point"));
+        rideSuggestion.setStartTimeMin(rs.getTimestamp("start_time_min"));
+        rideSuggestion.setStartTimeMax(rs.getTimestamp("start_time_max"));
+        rideSuggestion.setCapacity(rs.getInt("capacity"));
+        rideSuggestion.setFreeSeatsNumber(rs.getInt("free_seats_number"));
+        return rideSuggestion;
+    }
+
+    public List<RideSuggestion> getRideSuggestions(String startPoint, String destinationPoint, Timestamp startTimeMin, Timestamp startTimeMax) {
+        ResultSet rs = null;
+
+        List<RideSuggestion> reviewList = new ArrayList<RideSuggestion>();
+        try {
+            connection = ConnectionFactory.getConnection();
+            //todo add check for ride time
+            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions where start_point=? and destination_point=?");
+            preparedStatement.setString(1, startPoint);
+            preparedStatement.setString(2, destinationPoint);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+
+            while (rs.next()) {
+                RideSuggestion review = convertResultSetToRideSuggestion(rs);
+                reviewList.add(review);
+            }
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return reviewList;
+    }
 }

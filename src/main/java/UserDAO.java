@@ -67,8 +67,37 @@ public class UserDAO {
         return user;
     }
 
-    public void update (User user) throws SQLException {
+    public User getUser(Integer id) {
+        ResultSet rs = null;
+        User user = null;
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("select * from users where id=?");
+            preparedStatement.setInt(1, id);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+            user = new User();
+            while (rs.next()) {
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setLogin(rs.getString("login"));
+                user.setPassword(rs.getString("password"));
+                user.setPhone(rs.getString("phone"));
+            }
+        } catch (SQLException e) {
+            //TODO
+            e.printStackTrace();
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return user;
+    }
+
+    public int update (User user)  {
         connection = ConnectionFactory.getConnection();
+        try {
         preparedStatement = connection.prepareStatement(
                 "update users set" +
                         " login = ?," +
@@ -78,15 +107,20 @@ public class UserDAO {
                         " phone = ?," +
                         " where login = ?;"
         );
-        preparedStatement.setString(1, user.getLogin());
-        preparedStatement.setString(4, user.getPassword());
-        preparedStatement.setString(2, user.getFirstName());
-        preparedStatement.setString(3, user.getLastName());
-        preparedStatement.setString(5, user.getPhone());
 
+        preparedStatement.setString(1, user.getLogin());
+        preparedStatement.setString(2, user.getPassword());
+        preparedStatement.setString(3, user.getFirstName());
+        preparedStatement.setString(4, user.getLastName());
+        preparedStatement.setString(5, user.getPhone());
         preparedStatement.setString(6, user.getLogin());
 
         preparedStatement.execute();
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        }
+        return 0;
     }
     //TODO Delete
 
