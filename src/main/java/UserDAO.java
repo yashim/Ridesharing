@@ -8,8 +8,9 @@ public class UserDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public void createUser(User user) throws SQLException {
+    public int createUser(User user) {
         ResultSet generatedKeys = null;
+        int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO users (first_name, last_name,login, password, phone) " +
@@ -24,11 +25,18 @@ public class UserDAO {
             if (affectedRows == 0) {
                 throw new SQLException("Creating user failed, no rows affected.");
             }
-        }
-        finally {
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                result = generatedKeys.getInt(1);
+            }
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
+        return result;
     }
 
     public User getUser(String login) {

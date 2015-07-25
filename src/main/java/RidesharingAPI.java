@@ -20,10 +20,15 @@ public class RidesharingAPI {
 			return new ResponseError("No user with login '%s' found", login);
 		}, JsonUtil.json());
 
-        post("/create_ride", (req, res) -> rideSuggestionDAO.createRideSuggestion(
+        post("/createRide", (req, res) -> rideSuggestionDAO.createRideSuggestion(
                 new RideSuggestion(req.queryParams("login"), req.queryParams("startPoint"), req.queryParams("destinationPoint"),
                         Timestamp.valueOf(req.queryParams("startTimeMin")), Timestamp.valueOf(req.queryParams("startTimeMax")),
                         Integer.parseInt(req.queryParams("capacity")), Integer.parseInt(req.queryParams("capacity")))
+        ), JsonUtil.json());
+
+        post("/register", (req, res) -> userDAO.createUser(
+                new User(req.queryParams("login"), req.queryParams("password"), req.queryParams("firstName"),
+                        req.queryParams("lastName"), req.queryParams("phone"))
         ), JsonUtil.json());
 
 		after((req, res) -> res.type("application/json"));
@@ -35,11 +40,11 @@ public class RidesharingAPI {
 	}
 }
     /*
-    Json createRide(login, startPoint, destinationPoint, startTimeMin, startTimeMax, capacity)
++   Json createRide(login, startPoint, destinationPoint, startTimeMin, startTimeMax, capacity)
     Json getRidesList(id userId)
     Json cancelRide(id rideId)
     Json acceptPassenger(rideId, passengerId)
-    Json register(string login, string password, string firstName, string lastName)
++    Json register(string login, string password, string firstName, string lastName)
     Json getUser(id userId)
     Json saveProfile(...)
     Json getRidesList(startPoint, destination, departureTimeMin, departureTimeMax)
@@ -49,7 +54,6 @@ public class RidesharingAPI {
     Json getRide(id rideId)
     Json joinRide(rideId)
     Json unjoinRide(id rideId)
-    Json register(string login, string password, string firstName, string lastName)
     Json getUserSubscriptions(id userId)
     Json unsubscribe(id subscriptionId)
     Json login(string login, string password)

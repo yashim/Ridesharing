@@ -7,9 +7,10 @@ import java.sql.*;
 public class RideSuggestionDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
-
-    public String createRideSuggestion(RideSuggestion rideSuggestion) {
+//todo add check for duplicate suggestions
+    public int createRideSuggestion(RideSuggestion rideSuggestion) {
         ResultSet generatedKeys = null;
+        int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO ride_suggestions (user_login, start_point,destination_point, " +
@@ -27,14 +28,18 @@ public class RideSuggestionDAO {
             if (affectedRows == 0) {
                 throw new SQLException("Creating RideSuggestion failed, no rows affected.");
             }
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                result = generatedKeys.getInt(1);
+            }
         } catch (SQLException e) {
-            //Todo
+            //todo
             e.printStackTrace();
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return "OK";
+        return result;
     }
 
     public RideSuggestion getRideSuggestion(String login) throws SQLException {
