@@ -10,16 +10,16 @@ public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public void createRideSuggestion(SharedRide sharedRide) throws SQLException {
+    public void createRideSuggestion(int rideSuggestionId, int userId, int seatsAmount) throws SQLException {
         ResultSet generatedKeys = null;
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount " +
                     "VALUES (?, ? ,?)";
             preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1, sharedRide.getRideSuggestionId());
-            preparedStatement.setInt(2, sharedRide.getUserId());
-            preparedStatement.setInt(3, sharedRide.getSeatsAmount());
+            preparedStatement.setInt(1, rideSuggestionId);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.setInt(3, seatsAmount);
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating SharedRide failed, no rows affected.");

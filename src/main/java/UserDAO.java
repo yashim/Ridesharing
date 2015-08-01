@@ -66,7 +66,7 @@ public class UserDAO {
         }
         return user;
     }
-
+//todo change result
     public User getUser(Integer id) {
         ResultSet rs = null;
         User user = null;

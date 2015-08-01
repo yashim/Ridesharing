@@ -79,7 +79,7 @@ public class RideSuggestionDAO {
     }
 
 
-    public RideSuggestion getRideSuggestion(int id) throws SQLException {
+    public RideSuggestion getRideSuggestion(int id) {
         ResultSet rs = null;
         RideSuggestion rideSuggestion = null;
         try {
@@ -92,6 +92,9 @@ public class RideSuggestionDAO {
             while (rs.next()) {
                 rideSuggestion = convertResultSetToRideSuggestion(rs);
             }
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -123,17 +126,22 @@ public class RideSuggestionDAO {
         preparedStatement.execute();
     }
 
-    public void delete(int id) throws SQLException {
+    public int delete(int rideSuggestionId){
+        int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("DELETE FROM ride_suggestions where ride_suggestion_id=?");
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, rideSuggestionId);
             preparedStatement.execute();
-        }
-        finally {
+            result = 0;
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
+        return result;
     }
 
     public List<RideSuggestion> getRideSuggestionsWhereUserIsDriver(int userId) {
@@ -244,5 +252,32 @@ public class RideSuggestionDAO {
 
         return ridesWithType;
 
+    }
+
+    public Object getRide(int rideId) {
+        ResultSet rs = null;
+        RideSuggestion rideSuggestion = null;
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
+                    "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, capacity, " +
+                    "free_seats_number FROM ride_suggestions INNER JOIN users ON ride_suggestions.user_id = users.user_id" +
+                    " WHERE ride_suggestion_id=?");
+            preparedStatement.setInt(1, rideId);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+            rideSuggestion = new RideSuggestion();
+            while (rs.next()) {
+                rideSuggestion = convertResultSetToRideSuggestion(rs);
+            }
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return rideSuggestion;
     }
 }
