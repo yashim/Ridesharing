@@ -36,7 +36,7 @@
         <option name="value" value="2015-07-25 12:12:00.0" />
       </KeyValuePair>
       <KeyValuePair>
-        <option name="key" value="startTimeMax" />
+        <option name="key" value="timeLag" />
         <option name="value" value="2015-07-25 12:42:00.0" />
       </KeyValuePair>
       <KeyValuePair>

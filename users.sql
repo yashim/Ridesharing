@@ -1,1 +1,3 @@
-INSERT INTO ridesharing.users (user_id, login, password, first_name, last_name, phone) VALUES (1, 'shim4ik.ilya@gmail.com', '12345678', 'Ilya', 'Shimchik', '+79629402777');
+INSERT INTO ridesharing.users (login, password, first_name, last_name, phone) VALUES ('shim4ik.ilya@gmail.com', '12345678', 'Ilya', 'Shimchik', '+79629402777');
+INSERT INTO ridesharing.users (login, password, first_name, last_name, phone) VALUES ('artyom.vorobyev@gmail.com', '12345678', 'Artyom', 'Vorobyev', '+79872348246');
+INSERT INTO ridesharing.users (login, password, first_name, last_name, phone) VALUES ('maxim.antonenko@gmail.com ', '12345678', 'Maxim', 'Antonenko', '+79166969235');

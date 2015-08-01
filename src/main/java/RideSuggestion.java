@@ -5,35 +5,34 @@ import java.sql.Timestamp;
  * Creation date: 7/24/15.
  */
 public class RideSuggestion {
-    private String userLogin;
+    private int userId;
     private String startPoint;
     private String destinationPoint;
-    private Timestamp startTimeMin;
-    private Timestamp startTimeMax;
+    private Timestamp rideTime;
+    private int timeLag;
     private int capacity;
     private int freeSeatsNumber;
 
     public RideSuggestion() {
     }
 
-    public RideSuggestion(String userLogin, String startPoint, String destinationPoint, Timestamp startTimeMin,
-                          Timestamp startTimeMax, int capacity, int free_seats_number) {
-        //this.id = id;
-        this.userLogin = userLogin;
+    public RideSuggestion(int userId, String startPoint, String destinationPoint, Timestamp rideTime,
+                          int timeLag, int capacity, int free_seats_number) {
+        this.userId = userId;
         this.startPoint = startPoint;
         this.destinationPoint = destinationPoint;
-        this.startTimeMin = startTimeMin;
-        this.startTimeMax = startTimeMax;
+        this.rideTime = rideTime;
+        this.timeLag = timeLag;
         this.capacity = capacity;
         this.freeSeatsNumber = free_seats_number;
     }
 
-    public String getUserLogin() {
-        return userLogin;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUserLogin(String userLogin) {
-        this.userLogin = userLogin;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getStartPoint() {
@@ -53,19 +52,19 @@ public class RideSuggestion {
     }
 
     public Timestamp getStartTimeMin() {
-        return startTimeMin;
+        return rideTime;
     }
 
-    public void setStartTimeMin(Timestamp startTimeMin) {
-        this.startTimeMin = startTimeMin;
+    public void setStartTimeMin(Timestamp rideTime) {
+        this.rideTime = rideTime;
     }
 
-    public Timestamp getStartTimeMax() {
-        return startTimeMax;
+    public int getTimeLag() {
+        return timeLag;
     }
 
-    public void setStartTimeMax(Timestamp startTimeMax) {
-        this.startTimeMax = startTimeMax;
+    public void setTimeLag(int timeLag) {
+        this.timeLag = timeLag;
     }
 
     public int getCapacity() {

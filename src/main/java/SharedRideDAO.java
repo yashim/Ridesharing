@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: shim.
@@ -68,6 +70,52 @@ public class SharedRideDAO {
         preparedStatement.execute();
     }
 
-    //TODO delete
+    public List<SharedRide> getSharedRideList(int userId) {
+        ResultSet rs = null;
+
+        List<SharedRide> sharedRideList = new ArrayList<>();
+        try {
+            connection = ConnectionFactory.getConnection();
+            //todo add check for ride time
+            preparedStatement = connection.prepareCall("SELECT * FROM shared_rides where user_id!=?");
+            preparedStatement.setInt(1, userId);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+
+            while (rs.next()) {
+                SharedRide sharedRide = convertResultSetToSharedRide(rs);
+                sharedRideList.add(sharedRide);
+            }
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return sharedRideList;
+    }
+
+    private SharedRide convertResultSetToSharedRide(ResultSet rs) throws SQLException{
+        SharedRide sharedRide = new SharedRide();
+        sharedRide.setRideSuggestionId(rs.getInt("start_point"));
+        sharedRide.setUserId(rs.getInt("user_id"));
+        sharedRide.setSeatsAmount(rs.getInt("destination_point"));
+        return sharedRide;
+    }
+
+    public void delete(int id) throws SQLException {
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("DELETE FROM shared_rides where shared_ride_id=?");
+            preparedStatement.setInt(1, id);
+            preparedStatement.execute();
+        }
+        finally {
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+    }
 
 }

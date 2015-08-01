@@ -122,7 +122,18 @@ public class UserDAO {
         }
         return 0;
     }
-    //TODO Delete
+    public void delete(int id) throws SQLException {
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("DELETE FROM users where user_id=?");
+            preparedStatement.setInt(1, id);
+            preparedStatement.execute();
+        }
+        finally {
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+    }
 
 
     public boolean exist (String login) throws SQLException {
