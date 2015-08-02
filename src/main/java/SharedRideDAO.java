@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -10,9 +11,10 @@ public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 //todo decrease seats_amount
-    public int joinRide(int rideSuggestionId, int userId, int seatsAmount) {
-        ResultSet generatedKeys = null;
-        int result = -1;
+    public Hashtable<String, String> joinRide(int rideSuggestionId, int userId, int seatsAmount) {
+        ResultSet generatedKeys;
+        Hashtable<String, String> joinRideResult = new Hashtable<>();
+        joinRideResult.put("Status", "-1");
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount) " +
@@ -27,7 +29,8 @@ public class SharedRideDAO {
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
-                result = generatedKeys.getInt(1);
+                joinRideResult.replace("Status", "0");
+                joinRideResult.put("RideId", Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
             //todo
@@ -36,7 +39,7 @@ public class SharedRideDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return result;
+        return joinRideResult;
     }
 
     public SharedRide getSharedRide(int id) throws SQLException {

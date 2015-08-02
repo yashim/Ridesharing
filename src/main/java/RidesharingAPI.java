@@ -53,9 +53,9 @@ public class RidesharingAPI {
             return rideSuggestionDAO.delete(Integer.parseInt(req.queryParams("rideId")));
         }, JsonUtil.json());
 
-        post("/register", (req, res) -> userDAO.createUser(new User(req.queryParams("login"), req.queryParams("password"),
-                        req.queryParams("firstName"), req.queryParams("lastName"), req.queryParams("phone"))),
-                JsonUtil.json());
+        post("/register", (req, res) ->
+                JsonUtil.toJson(userDAO.createUser(new User(req.queryParams("login"), req.queryParams("password"),
+                        req.queryParams("firstName"), req.queryParams("lastName"), req.queryParams("phone")))));
 
         post("/login", (req, res) -> tokenDAO.login(req.queryParams("login"), req.queryParams("password")),
                 JsonUtil.json());

@@ -48,11 +48,12 @@ public class TokenDAO {
         String randomUUIDString;
         try {
             connection = ConnectionFactory.getConnection();
-            String sqlInsertReview = "INSERT INTO tokens (user_id, token) VALUES (?, ?) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id)";
+            String sqlInsertReview = "INSERT INTO tokens (user_id, token) VALUES (?, ?) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), token=?";
             preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, userId);
             randomUUIDString = uuid.toString();
             preparedStatement.setString(2, randomUUIDString);
+            preparedStatement.setString(3, randomUUIDString);
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating token failed, no rows affected.");
