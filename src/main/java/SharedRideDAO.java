@@ -10,8 +10,9 @@ public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public void createRideSuggestion(int rideSuggestionId, int userId, int seatsAmount) throws SQLException {
+    public int createRideSuggestion(int rideSuggestionId, int userId, int seatsAmount) {
         ResultSet generatedKeys = null;
+        int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount " +
@@ -24,11 +25,18 @@ public class SharedRideDAO {
             if (affectedRows == 0) {
                 throw new SQLException("Creating SharedRide failed, no rows affected.");
             }
-        }
-        finally {
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                result = generatedKeys.getInt(1);
+            }
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
+        return result;
     }
 
     public SharedRide getSharedRide(int id) throws SQLException {
@@ -105,17 +113,22 @@ public class SharedRideDAO {
         return sharedRide;
     }
 
-    public void delete(int id) throws SQLException {
+    public int delete(int id) {
+        int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("DELETE FROM shared_rides where shared_ride_id=?");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        }
-        finally {
+            result = 0;
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
+        return result;
     }
 
 }

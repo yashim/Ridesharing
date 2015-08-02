@@ -1,4 +1,5 @@
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,11 +11,11 @@ import java.sql.SQLException;
  */
 public class ConnectionFactory {
 
-    private final Logger logger = Logger.getLogger(ConnectionFactory.class);
+    private final Logger logger = LogManager.getLogger(ConnectionFactory.class);
 
     public static final String MYSQL_LOCAL_DB_URL = "jdbc:mysql://localhost:3306/ridesharing";
-    public static final String MYSQL_LOCAL_DB_USER = "root";
-    public static final String MYSQL_LOCAL_DB_USER_PASSWORD = "root";
+    public static final String MYSQL_LOCAL_DB_USER = "shim";
+    public static final String MYSQL_LOCAL_DB_USER_PASSWORD = "shim";
     public static final String MYSQL_LIBRARY_CLASS_NAME = "com.mysql.jdbc.Driver";
 
     //static reference to itself

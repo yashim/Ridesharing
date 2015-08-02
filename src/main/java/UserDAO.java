@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: shim.
@@ -8,9 +10,10 @@ public class UserDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public int createUser(User user) {
+    public List<String> createUser(User user) {
         ResultSet generatedKeys = null;
-        int result = -1;
+        List<String> result = new ArrayList<>();
+        result.add("-1");
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO users (first_name, last_name,login, password, phone) " +
@@ -21,13 +24,15 @@ public class UserDAO {
             preparedStatement.setString(3, user.getLogin());
             preparedStatement.setString(4, user.getPassword());
             preparedStatement.setString(5, user.getPhone());
+
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating user failed, no rows affected.");
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
-                result = generatedKeys.getInt(1);
+                result.set(0, "0");
+                result.add(Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
             //todo

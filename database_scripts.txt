@@ -2,35 +2,40 @@ CREATE DATABASE ridesharing;
 
 CREATE TABLE ride_suggestions
 (
-  ride_suggestion_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  start_point VARCHAR(255) NOT NULL,
-  destination_point VARCHAR(255) NOT NULL,
-  ride_time DATETIME NOT NULL,
-  time_lag INT NOT NULL,
-  capacity INT NOT NULL,
-  free_seats_number INT NOT NULL
+    ride_suggestion_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    start_point VARCHAR(255) NOT NULL,
+    destination_point VARCHAR(255) NOT NULL,
+    ride_time DATETIME NOT NULL,
+    time_lag INT NOT NULL,
+    capacity INT NOT NULL,
+    free_seats_number INT NOT NULL
 );
-
-
 CREATE TABLE shared_rides
 (
-  shared_ride_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  ride_suggestion_id INT NOT NULL,
-  user_id INT NOT NULL,
-  seats_amount INT NOT NULL
+    shared_ride_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    ride_suggestion_id INT NOT NULL,
+    user_id INT NOT NULL,
+    seats_amount INT NOT NULL
 );
-
+CREATE TABLE tokens
+(
+    token_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    token VARCHAR(36) NOT NULL
+);
 CREATE TABLE users
 (
-  user_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  login VARCHAR(255) NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  first_name VARCHAR(255) NOT NULL,
-  last_name VARCHAR(255) NOT NULL,
-  phone VARCHAR(20)
+    user_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    login VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20)
 );
-
+CREATE UNIQUE INDEX unique_token_id ON tokens (token_id);
+CREATE UNIQUE INDEX unique_user_id ON tokens (user_id);
+CREATE UNIQUE INDEX unique_login ON users (login);
 
 
 INSERT INTO users (login, password, first_name, last_name, phone) VALUES ('shim4ik.ilya@gmail.com', '12345678', 'Ilya', 'Shimchik', '+79629402777');

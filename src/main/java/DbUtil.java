@@ -1,4 +1,5 @@
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,7 +12,7 @@ import java.sql.Statement;
  */
 public class DbUtil {
 
-    private static final Logger logger = Logger.getLogger(DbUtil.class);
+    private static final Logger logger = LogManager.getLogger(DbUtil.class);
 
     public static void close(Connection connection) {
         if (connection != null) {
