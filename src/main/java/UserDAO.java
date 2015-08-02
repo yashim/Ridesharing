@@ -1,6 +1,5 @@
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
 
 /**
  * Author: shim.
@@ -10,10 +9,10 @@ public class UserDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public List<String> createUser(User user) {
+    public Hashtable<String, String> createUser(User user) {
         ResultSet generatedKeys = null;
-        List<String> result = new ArrayList<>();
-        result.add("-1");
+        Hashtable<String, String> createUserResult = new Hashtable<>();
+        createUserResult.put("Status","-1");
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO users (first_name, last_name,login, password, phone) " +
@@ -31,8 +30,8 @@ public class UserDAO {
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
-                result.set(0, "0");
-                result.add(Integer.toString(generatedKeys.getInt(1)));
+                createUserResult.replace("Status", "0");
+                createUserResult.put("UserId",Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
             //todo
@@ -41,7 +40,7 @@ public class UserDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return result;
+        return createUserResult;
     }
 
     public User getUser(String login) {

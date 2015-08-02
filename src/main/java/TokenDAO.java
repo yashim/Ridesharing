@@ -1,6 +1,5 @@
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
 import java.util.UUID;
 
 /**
@@ -11,10 +10,10 @@ public class TokenDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public  List<String> login(String login, String password){
+    public Hashtable<String, String> login(String login, String password){
         ResultSet rs;
-        List<String> result = new ArrayList<>();
-        result.add("-1");
+        Hashtable<String, String> loginResult = new Hashtable<>();
+        loginResult.put("Status", "-1");
         String passwordDb = null;
         try {
             connection = ConnectionFactory.getConnection();
@@ -27,8 +26,12 @@ public class TokenDAO {
                 passwordDb = rs.getString("password");
                 userId = rs.getInt("user_id");
             }
-            if (passwordDb.equals(password))
-                return createToken(userId);
+            if (passwordDb.equals(password)){
+                loginResult.replace("Status", "0");
+                loginResult.put("Token", createToken(userId));
+                loginResult.put("UserId", Integer.toString(userId));
+                return loginResult;
+            }
         } catch (SQLException e) {
             //todo
             e.printStackTrace();
@@ -36,12 +39,11 @@ public class TokenDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return result;
+        return loginResult;
     }
 
-    public List<String> createToken(int userId) {
-        List<String> result = new ArrayList<>();
-        result.add("-1");
+    public String createToken(int userId) {
+        String result = "-1";
         UUID uuid = UUID.randomUUID();
         String randomUUIDString;
         try {
@@ -55,8 +57,7 @@ public class TokenDAO {
             if (affectedRows == 0) {
                 throw new SQLException("Creating token failed, no rows affected.");
             }
-            result.set(0, "0");
-            result.add(randomUUIDString);
+            result = randomUUIDString;
         } catch (SQLException e) {
             //todo
             e.printStackTrace();
