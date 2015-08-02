@@ -9,7 +9,7 @@ import java.util.List;
 public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
-
+//todo decrease seats_amount
     public int joinRide(int rideSuggestionId, int userId, int seatsAmount) {
         ResultSet generatedKeys = null;
         int result = -1;
@@ -113,12 +113,13 @@ public class SharedRideDAO {
         return sharedRide;
     }
 
-    public int delete(int id) {
+    public int delete(int rideId, int userId) {
         int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("DELETE FROM shared_rides where shared_ride_id=?");
-            preparedStatement.setInt(1, id);
+            preparedStatement = connection.prepareCall("DELETE FROM shared_rides where ride_suggestion_id=? AND user_id=?");
+            preparedStatement.setInt(1, rideId);
+            preparedStatement.setInt(2, userId);
             preparedStatement.execute();
             result = 0;
         } catch (SQLException e) {

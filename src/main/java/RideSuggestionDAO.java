@@ -177,12 +177,12 @@ public class RideSuggestionDAO {
         List<RideSuggestion> rideSuggestionList = new ArrayList<>();
         try {
             connection = ConnectionFactory.getConnection();
-            //todo add check for ride time
+
             preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
                     "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, " +
-                    "capacity, free_seats_number FROM ride_suggestions INNER JOIN shared_rides ON " +
-                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id WHERE shared_rides.user_id!=? " +
-                    "AND ride_suggestions.user_id!=? AND ride_time > NOW() AND free_seats_number > 0");
+                    "capacity, free_seats_number FROM ride_suggestions LEFT JOIN shared_rides ON " +
+                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id WHERE shared_rides.user_id<>? " +
+                    "AND ride_suggestions.user_id <> ? AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
             preparedStatement.setInt(2, userId);
             preparedStatement.execute();
@@ -214,7 +214,7 @@ public class RideSuggestionDAO {
 
             preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
                     "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, " +
-                    "capacity, free_seats_number FROM ride_suggestions INNER JOIN shared_rides ON " +
+                    "capacity, free_seats_number FROM ride_suggestions LEFT JOIN shared_rides ON " +
                     "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id WHERE shared_rides.user_id=? " +
                     "AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
@@ -256,7 +256,6 @@ public class RideSuggestionDAO {
         ridesWithType.put(RideSuggestionType.DRIVER, getRideSuggestionsWhereUserIsDriver(userId));
         ridesWithType.put(RideSuggestionType.UNDEFINED, getRideSuggestionsMadeByOthers(userId));
 
-
         return ridesWithType;
 
     }
@@ -268,7 +267,7 @@ public class RideSuggestionDAO {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
                     "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, capacity, " +
-                    "free_seats_number FROM ride_suggestions INNER JOIN users ON ride_suggestions.user_id = users.user_id" +
+                    "free_seats_number FROM ride_suggestions LEFT JOIN users ON ride_suggestions.user_id = users.user_id" +
                     " WHERE ride_suggestion_id=? ride_time > NOW() and free_seats_number > 0");
             preparedStatement.setInt(1, rideId);
             preparedStatement.execute();

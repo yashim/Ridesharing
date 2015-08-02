@@ -1,3 +1,5 @@
+import spark.Spark;
+
 import java.sql.Timestamp;
 
 import static spark.Spark.*;
@@ -7,6 +9,24 @@ public class RidesharingAPI {
 
     public RidesharingAPI(final UserDAO userDAO, final RideSuggestionDAO rideSuggestionDAO,
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO) {
+        Spark.options("/*", (request, response) -> {
+
+            String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+            if (accessControlRequestHeaders != null) {
+                response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+            }
+
+            String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
+            if (accessControlRequestMethod != null) {
+                response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+            }
+
+            return "OK";
+        });
+
+        Spark.before((request,response)->{
+            response.header("Access-Control-Allow-Origin", "*");
+        });
 
         post("/createRide", (req, res) -> {
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
@@ -83,7 +103,7 @@ public class RidesharingAPI {
                     String token = tokenDAO.getToken(userId);
                     if (!token.equals(req.queryParams("token")))
                         return -1;
-                    return sharedRideDAO.delete(Integer.parseInt(req.queryParams("rideId")));
+                    return sharedRideDAO.delete(Integer.parseInt(req.queryParams("rideId")),Integer.parseInt(req.queryParams("userId")));
                 },
                 JsonUtil.json());
 
