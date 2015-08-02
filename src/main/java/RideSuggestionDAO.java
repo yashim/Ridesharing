@@ -14,7 +14,6 @@ public class RideSuggestionDAO {
 
 
     public List<String> createRideSuggestion(RideSuggestion rideSuggestion) {
-        //checkToken()
         ResultSet generatedKeys;
         List<String> result = new ArrayList<>();
         result.add("-1");
@@ -151,7 +150,8 @@ public class RideSuggestionDAO {
         try {
             connection = ConnectionFactory.getConnection();
             //todo add check for ride time
-            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions where user_id=?");
+            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions WHERE user_id=? AND " +
+                    "ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -178,8 +178,13 @@ public class RideSuggestionDAO {
         try {
             connection = ConnectionFactory.getConnection();
             //todo add check for ride time
-            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions where user_id!=?");
+            preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
+                    "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, " +
+                    "capacity, free_seats_number FROM ride_suggestions INNER JOIN shared_rides ON " +
+                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id WHERE shared_rides.user_id!=? " +
+                    "AND ride_suggestions.user_id!=? AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, userId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
 
@@ -209,8 +214,9 @@ public class RideSuggestionDAO {
 
             preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
                     "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, " +
-                    "capacity, free_seats_number FROM ride_suggestions INNER JOIN shared_rides on " +
-                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id where shared_rides.user_id=?");
+                    "capacity, free_seats_number FROM ride_suggestions INNER JOIN shared_rides ON " +
+                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id WHERE shared_rides.user_id=? " +
+                    "AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -233,10 +239,11 @@ public class RideSuggestionDAO {
 
     private RideSuggestion convertResultSetToRideSuggestion(ResultSet rs) throws SQLException{
         RideSuggestion rideSuggestion = new RideSuggestion();
+        rideSuggestion.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
         rideSuggestion.setUserId(rs.getInt("user_id"));
         rideSuggestion.setStartPoint(rs.getString("start_point"));
         rideSuggestion.setDestinationPoint(rs.getString("destination_point"));
-        rideSuggestion.setStartTimeMin(rs.getTimestamp("start_time_min"));
+        rideSuggestion.setStartTimeMin(rs.getTimestamp("ride_time"));
         rideSuggestion.setTimeLag(rs.getInt("time_lag"));
         rideSuggestion.setCapacity(rs.getInt("capacity"));
         rideSuggestion.setFreeSeatsNumber(rs.getInt("free_seats_number"));
@@ -262,7 +269,7 @@ public class RideSuggestionDAO {
             preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
                     "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, capacity, " +
                     "free_seats_number FROM ride_suggestions INNER JOIN users ON ride_suggestions.user_id = users.user_id" +
-                    " WHERE ride_suggestion_id=?");
+                    " WHERE ride_suggestion_id=? ride_time > NOW() and free_seats_number > 0");
             preparedStatement.setInt(1, rideId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();

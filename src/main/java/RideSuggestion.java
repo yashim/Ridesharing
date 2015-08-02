@@ -5,6 +5,7 @@ import java.sql.Timestamp;
  * Creation date: 7/24/15.
  */
 public class RideSuggestion {
+    private int rideSuggestionId;
     private int userId;
     private String startPoint;
     private String destinationPoint;
@@ -15,7 +16,6 @@ public class RideSuggestion {
 
     public RideSuggestion() {
     }
-
     public RideSuggestion(int userId, String startPoint, String destinationPoint, Timestamp rideTime,
                           int timeLag, int capacity, int free_seats_number) {
         this.userId = userId;
@@ -25,6 +25,34 @@ public class RideSuggestion {
         this.timeLag = timeLag;
         this.capacity = capacity;
         this.freeSeatsNumber = free_seats_number;
+    }
+
+    public RideSuggestion(int rideSuggestionId, int userId, String startPoint, String destinationPoint, Timestamp rideTime,
+                          int timeLag, int capacity, int free_seats_number) {
+        this.rideSuggestionId = rideSuggestionId;
+        this.userId = userId;
+        this.startPoint = startPoint;
+        this.destinationPoint = destinationPoint;
+        this.rideTime = rideTime;
+        this.timeLag = timeLag;
+        this.capacity = capacity;
+        this.freeSeatsNumber = free_seats_number;
+    }
+
+    public int getRideSuggestionId() {
+        return rideSuggestionId;
+    }
+
+    public void setRideSuggestionId(int rideSuggestionId) {
+        this.rideSuggestionId = rideSuggestionId;
+    }
+
+    public Timestamp getRideTime() {
+        return rideTime;
+    }
+
+    public void setRideTime(Timestamp rideTime) {
+        this.rideTime = rideTime;
     }
 
     public int getUserId() {

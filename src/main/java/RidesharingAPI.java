@@ -74,7 +74,7 @@ public class RidesharingAPI {
                     String token = tokenDAO.getToken(userId);
                     if (!token.equals(req.queryParams("token")))
                         return -1;
-                    return sharedRideDAO.createRideSuggestion(Integer.parseInt(req.queryParams("rideId")), userId, 1) ;
+                    return sharedRideDAO.joinRide(Integer.parseInt(req.queryParams("rideId")), userId, 1) ;
                 },
                 JsonUtil.json());
 

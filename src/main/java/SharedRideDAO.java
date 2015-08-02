@@ -10,12 +10,12 @@ public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
-    public int createRideSuggestion(int rideSuggestionId, int userId, int seatsAmount) {
+    public int joinRide(int rideSuggestionId, int userId, int seatsAmount) {
         ResultSet generatedKeys = null;
         int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
-            String sqlInsertReview = "INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount " +
+            String sqlInsertReview = "INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount) " +
                     "VALUES (?, ? ,?)";
             preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, rideSuggestionId);
