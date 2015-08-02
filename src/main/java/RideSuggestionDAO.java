@@ -143,22 +143,27 @@ public class RideSuggestionDAO {
         return result;
     }
 
-    public List<RideSuggestion> getRideSuggestionsWhereUserIsDriver(int userId) {
+    public List<RideDetails> getRideSuggestionsWhereUserIsDriver(int userId) {
         ResultSet rs = null;
 
-        List<RideSuggestion> rideSuggestionList = new ArrayList<>();
+        List<RideDetails> rideDetailsList = new ArrayList<>();
         try {
             connection = ConnectionFactory.getConnection();
             //todo add check for ride time
-            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions WHERE user_id=? AND " +
+            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, " +
+                    "start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, " +
+                    "ride_suggestions.ride_suggestion_id, ride_suggestions.user_id " +
+                    "FROM ride_suggestions " +
+                    "JOIN users ON users.user_id = ride_suggestions.ride_suggestion_id " +
+                    "WHERE ride_suggestions.user_id=? AND " +
                     "ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
 
             while (rs.next()) {
-                RideSuggestion rideSuggestion = convertResultSetToRideSuggestion(rs);
-                rideSuggestionList.add(rideSuggestion);
+                RideDetails rideDetails = convertResultSetToRideSuggestion(rs);
+                rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
             //todo
@@ -168,20 +173,22 @@ public class RideSuggestionDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return rideSuggestionList;
+        return rideDetailsList;
     }
 
-    public List<RideSuggestion> getRideSuggestionsMadeByOthers(int userId) {
+    public List<RideDetails> getRideSuggestionsMadeByOthers(int userId) {
         ResultSet rs = null;
 
-        List<RideSuggestion> rideSuggestionList = new ArrayList<>();
+        List<RideDetails> rideDetailsList = new ArrayList<>();
         try {
             connection = ConnectionFactory.getConnection();
 
-            preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
-                    "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, " +
-                    "capacity, free_seats_number FROM ride_suggestions LEFT JOIN shared_rides ON " +
-                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id WHERE (shared_rides.user_id IS NULL OR shared_rides.user_id  <>? )" +
+            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, " +
+                    "start_point, destination_point, ride_time, time_lag, capacity, free_seats_number," +
+                    "ride_suggestions.ride_suggestion_id,ride_suggestions.user_id FROM ride_suggestions LEFT JOIN shared_rides ON " +
+                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
+                    "JOIN users ON users.user_id = ride_suggestions.ride_suggestion_id " +
+                    "WHERE (shared_rides.user_id IS NULL OR shared_rides.user_id  <>? )" +
                     "AND (ride_suggestions.user_id IS NULL OR ride_suggestions.user_id <> ?) AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
             preparedStatement.setInt(2, userId);
@@ -189,8 +196,8 @@ public class RideSuggestionDAO {
             rs = preparedStatement.getResultSet();
 
             while (rs.next()) {
-                RideSuggestion review = convertResultSetToRideSuggestion(rs);
-                rideSuggestionList.add(review);
+                RideDetails rideDetails = convertResultSetToRideSuggestion(rs);
+                rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
             //todo
@@ -200,30 +207,30 @@ public class RideSuggestionDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return rideSuggestionList;
+        return rideDetailsList;
     }
 
-    public List<RideSuggestion> getRideSuggestionsWhereUserIsPassenger(int userId) {
+    public List<RideDetails> getRideSuggestionsWhereUserIsPassenger(int userId) {
         ResultSet rs = null;
 
-        List<RideSuggestion> rideSuggestionList = new ArrayList<>();
+        List<RideDetails> rideDetailsList = new ArrayList<>();
         try {
             connection = ConnectionFactory.getConnection();
             //todo add check for ride time
-            //SELECT ride_suggestions.ride_suggestion_id, ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number FROM ride_suggestions INNER JOIN shared_rides on ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id;
-
-            preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
-                    "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, " +
-                    "capacity, free_seats_number FROM ride_suggestions LEFT JOIN shared_rides ON " +
-                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id WHERE shared_rides.user_id=? " +
+            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, " +
+                    "start_point, destination_point, ride_time, time_lag, capacity, free_seats_number," +
+                    "ride_suggestions.ride_suggestion_id,ride_suggestions.user_id FROM ride_suggestions LEFT JOIN shared_rides ON " +
+                    "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
+                    "JOIN users ON users.user_id = ride_suggestions.ride_suggestion_id " +
+                    "WHERE shared_rides.user_id=? " +
                     "AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
 
             while (rs.next()) {
-                RideSuggestion review = convertResultSetToRideSuggestion(rs);
-                rideSuggestionList.add(review);
+                RideDetails rideDetails = convertResultSetToRideSuggestion(rs);
+                rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
             //todo
@@ -233,25 +240,28 @@ public class RideSuggestionDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return rideSuggestionList;
+        return rideDetailsList;
     }
 
 
-    private RideSuggestion convertResultSetToRideSuggestion(ResultSet rs) throws SQLException{
-        RideSuggestion rideSuggestion = new RideSuggestion();
-        rideSuggestion.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
-        rideSuggestion.setUserId(rs.getInt("user_id"));
-        rideSuggestion.setStartPoint(rs.getString("start_point"));
-        rideSuggestion.setDestinationPoint(rs.getString("destination_point"));
-        rideSuggestion.setStartTimeMin(rs.getTimestamp("ride_time"));
-        rideSuggestion.setTimeLag(rs.getInt("time_lag"));
-        rideSuggestion.setCapacity(rs.getInt("capacity"));
-        rideSuggestion.setFreeSeatsNumber(rs.getInt("free_seats_number"));
-        return rideSuggestion;
+    private RideDetails convertResultSetToRideSuggestion(ResultSet rs) throws SQLException{
+        RideDetails rideDetails = new RideDetails();
+        rideDetails.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
+        rideDetails.setUserId(rs.getInt("user_id"));
+        rideDetails.setStartPoint(rs.getString("start_point"));
+        rideDetails.setDestinationPoint(rs.getString("destination_point"));
+        rideDetails.setStartTimeMin(rs.getTimestamp("ride_time"));
+        rideDetails.setTimeLag(rs.getInt("time_lag"));
+        rideDetails.setCapacity(rs.getInt("capacity"));
+        rideDetails.setFreeSeatsNumber(rs.getInt("free_seats_number"));
+        rideDetails.setDriverName(rs.getString("first_name"));
+        rideDetails.setDriverLastName(rs.getString("last_name"));
+        rideDetails.setDriverPhone(rs.getString("phone"));
+        return rideDetails;
     }
 
-    public Hashtable<RideSuggestionType, List<RideSuggestion>> getRides(int userId) {
-        Hashtable<RideSuggestionType, List<RideSuggestion>> ridesWithType = new Hashtable<>();
+    public Hashtable<RideSuggestionType, List<RideDetails>> getRides(int userId) {
+        Hashtable<RideSuggestionType, List<RideDetails>> ridesWithType = new Hashtable<>();
         ridesWithType.put(RideSuggestionType.PASSENGER, getRideSuggestionsWhereUserIsPassenger(userId));
         ridesWithType.put(RideSuggestionType.DRIVER, getRideSuggestionsWhereUserIsDriver(userId));
         ridesWithType.put(RideSuggestionType.UNDEFINED, getRideSuggestionsMadeByOthers(userId));
