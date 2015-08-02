@@ -267,8 +267,8 @@ public class RideSuggestionDAO {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
                     "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, capacity, " +
-                    "free_seats_number FROM ride_suggestions LEFT JOIN users ON ride_suggestions.user_id = users.user_id" +
-                    " WHERE ride_suggestion_id=? ride_time > NOW() and free_seats_number > 0");
+                    "free_seats_number FROM ride_suggestions " +
+                    " WHERE ride_suggestion_id=? ");
             preparedStatement.setInt(1, rideId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
