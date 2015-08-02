@@ -77,7 +77,7 @@ public class UserDAO {
         User user = null;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("select * from users where id=?");
+            preparedStatement = connection.prepareCall("select * from users where user_id=?");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();

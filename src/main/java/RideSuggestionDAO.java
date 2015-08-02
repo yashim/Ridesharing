@@ -260,22 +260,38 @@ public class RideSuggestionDAO {
 
     }
 
-    public Object getRide(int rideId) {
+//    driverName
+//    driverLastName
+//    driverPhone
+    public RideDetails getRide(int rideId) {
         ResultSet rs = null;
-        RideSuggestion rideSuggestion = null;
+        RideDetails rideDetails = new RideDetails();
         try {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("SELECT ride_suggestions.ride_suggestion_id, " +
                     "ride_suggestions.user_id, start_point, destination_point, ride_time, time_lag, capacity, " +
                     "free_seats_number FROM ride_suggestions " +
-                    " WHERE ride_suggestion_id=? ");
+                    " WHERE ride_suggestion_id=?");
             preparedStatement.setInt(1, rideId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
-            rideSuggestion = new RideSuggestion();
+
             while (rs.next()) {
-                rideSuggestion = convertResultSetToRideSuggestion(rs);
+                rideDetails.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
+                rideDetails.setUserId(rs.getInt("user_id"));
+                rideDetails.setStartPoint(rs.getString("start_point"));
+                rideDetails.setDestinationPoint(rs.getString("destination_point"));
+                rideDetails.setStartTimeMin(rs.getTimestamp("ride_time"));
+                rideDetails.setTimeLag(rs.getInt("time_lag"));
+                rideDetails.setCapacity(rs.getInt("capacity"));
+                rideDetails.setFreeSeatsNumber(rs.getInt("free_seats_number"));
             }
+            UserDAO userDAO = new UserDAO();
+            User user = userDAO.getUser(rideDetails.getUserId());
+            rideDetails.setDriverLastName(user.getLastName());
+            rideDetails.setDriverName(user.getFirstName());
+            rideDetails.setDriverPhone(user.getPhone());
+
         } catch (SQLException e) {
             //todo
             e.printStackTrace();
@@ -284,6 +300,6 @@ public class RideSuggestionDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return rideSuggestion;
+        return rideDetails;
     }
 }
