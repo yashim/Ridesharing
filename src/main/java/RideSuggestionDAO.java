@@ -154,7 +154,7 @@ public class RideSuggestionDAO {
                     "start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, " +
                     "ride_suggestions.ride_suggestion_id, ride_suggestions.user_id " +
                     "FROM ride_suggestions " +
-                    "JOIN users ON users.user_id = ride_suggestions.ride_suggestion_id " +
+                    "JOIN users ON users.user_id = ride_suggestions.user_id " +
                     "WHERE ride_suggestions.user_id=? AND " +
                     "ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
@@ -187,7 +187,7 @@ public class RideSuggestionDAO {
                     "start_point, destination_point, ride_time, time_lag, capacity, free_seats_number," +
                     "ride_suggestions.ride_suggestion_id,ride_suggestions.user_id FROM ride_suggestions LEFT JOIN shared_rides ON " +
                     "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
-                    "JOIN users ON users.user_id = ride_suggestions.ride_suggestion_id " +
+                    "JOIN users ON users.user_id = ride_suggestions.user_id " +
                     "WHERE (shared_rides.user_id IS NULL OR shared_rides.user_id  <>? )" +
                     "AND (ride_suggestions.user_id IS NULL OR ride_suggestions.user_id <> ?) AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
@@ -221,7 +221,7 @@ public class RideSuggestionDAO {
                     "start_point, destination_point, ride_time, time_lag, capacity, free_seats_number," +
                     "ride_suggestions.ride_suggestion_id,ride_suggestions.user_id FROM ride_suggestions LEFT JOIN shared_rides ON " +
                     "ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
-                    "JOIN users ON users.user_id = ride_suggestions.ride_suggestion_id " +
+                    "JOIN users ON users.user_id = ride_suggestions.user_id " +
                     "WHERE shared_rides.user_id=? " +
                     "AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
