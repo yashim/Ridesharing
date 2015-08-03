@@ -38,14 +38,14 @@ CREATE UNIQUE INDEX unique_user_id ON tokens (user_id);
 CREATE UNIQUE INDEX unique_login ON users (login);
 
 
-INSERT INTO users (login, password, first_name, last_name, phone) VALUES ('shim4ik.ilya@gmail.com', '12345678', 'Ilya', 'Shimchik', '+79629402777');
-INSERT INTO users (login, password, first_name, last_name, phone) VALUES ('artyom.vorobyev@gmail.com', '12345678', 'Artyom', 'Vorobyev', '+79872348246');
-INSERT INTO users (login, password, first_name, last_name, phone) VALUES ('maxim.antonenko@gmail.com ', '12345678', 'Maxim', 'Antonenko', '+79166969235');
+INSERT INTO users (login, password, first_name, last_name, phone) VALUES ('ilya@gmail.com', '12345678', 'Ilya', 'Shimchik', '+7888940277');
+INSERT INTO users (login, password, first_name, last_name, phone) VALUES ('artem@gmail.com', '12345678', 'Artyom', 'Vorobyev', '+78882348246');
+INSERT INTO users (login, password, first_name, last_name, phone) VALUES ('maxim@gmail.com ', '12345678', 'Maxim', 'Antonenko', '+7886969235');
 
-INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (1, 'Kazan', 'Innopolis', '2015-08-02 13:00:00.0', 10, 3, 3);
-INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (2, 'Innopolis', 'Kazan', '2015-08-02 17:00:00.0', 20, 3, 3);
-INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (1, 'Innopolis', 'Kazan', '2015-08-02 14:00:00.0', 15, 3, 3);
-INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (2, 'Kazan', 'Innopolis', '2015-08-02 18:00:00.0', 10, 3, 3);
+INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (1, 'Kazan', 'Innopolis', '2015-09-02 13:00:00.0', 10, 3, 3);
+INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (2, 'Innopolis', 'Kazan', '2015-09-02 17:00:00.0', 20, 3, 3);
+INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (1, 'Innopolis', 'Kazan', '2015-09-02 14:00:00.0', 15, 3, 3);
+INSERT INTO ride_suggestions (user_id, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number) VALUES (2, 'Kazan', 'Innopolis', '2015-09-02 18:00:00.0', 10, 3, 3);
 
 INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount) VALUES (2, 2, 1);
 INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount) VALUES (3, 2, 1);
