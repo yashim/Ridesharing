@@ -32,9 +32,9 @@ public class RidesharingAPI {
         post("/createRide", (req, res) -> {
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
             if (token == null || !token.equals(req.queryParams("token"))){
-                Hashtable<String, String> getUserResult = new Hashtable<>();
-                getUserResult.put("Status", "-1");
-                return getUserResult;
+                Hashtable<String, String> createRideResult = new Hashtable<>();
+                createRideResult.put("Status", "-1");
+                return createRideResult;
             }
             return rideSuggestionDAO.createRideSuggestion(
                     new RideSuggestion(Integer.parseInt(req.queryParams("userId")), req.queryParams("startPoint"),
@@ -46,17 +46,20 @@ public class RidesharingAPI {
         post("/getRidesList", (req, res) -> {
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
             if (token == null || !token.equals(req.queryParams("token"))){
-                Hashtable<String, String> getUserResult = new Hashtable<>();
-                getUserResult.put("Status", "-1");
-                return getUserResult;
+                Hashtable<String, String> getRidesListResult = new Hashtable<>();
+                getRidesListResult.put("Status", "-1");
+                return getRidesListResult;
             }
             return rideSuggestionDAO.getRides(Integer.parseInt(req.queryParams("userId")));
         }, JsonUtil.json());
 
         post("/cancelRide", (req, res) -> {
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
-            if (!token.equals(req.queryParams("token")))
-                return -1;
+            if (token == null || !token.equals(req.queryParams("token"))){
+                Hashtable<String, String> cancelRideResult = new Hashtable<>();
+                cancelRideResult.put("Status", "-1");
+                return cancelRideResult;
+            }
             return rideSuggestionDAO.delete(Integer.parseInt(req.queryParams("rideId")));
         }, JsonUtil.json());
 
@@ -70,9 +73,9 @@ public class RidesharingAPI {
         post("/getCurrentUser", (req, res) -> {
                     String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
                     if (token == null || !token.equals(req.queryParams("token"))){
-                        Hashtable<String, String> getUserResult = new Hashtable<>();
-                        getUserResult.put("Status", "-1");
-                        return getUserResult;
+                        Hashtable<String, String> getCurrentUserResult = new Hashtable<>();
+                        getCurrentUserResult.put("Status", "-1");
+                        return getCurrentUserResult;
                         }
                     return userDAO.getUser(Integer.parseInt(req.queryParams("rideId")));
                 },
@@ -81,8 +84,11 @@ public class RidesharingAPI {
         //todo change result 0/-1
         post("/saveProfile", (req, res) -> {
                     String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
-                    if (!token.equals(req.queryParams("token")))
-                        return -1;
+                    if (token == null || !token.equals(req.queryParams("token"))){
+                        Hashtable<String, String> saveProfileResult = new Hashtable<>();
+                        saveProfileResult.put("Status", "-1");
+                        return saveProfileResult;
+                    }
                     return userDAO.update(new User(req.queryParams("login"), req.queryParams("password"),
                             req.queryParams("firstName"), req.queryParams("lastName"), req.queryParams("phone")));
                 },
@@ -91,8 +97,11 @@ public class RidesharingAPI {
 
         post("/getRide", (req, res) -> {
                     String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
-                    if (!token.equals(req.queryParams("token")))
-                        return -1;
+                    if (token == null || !token.equals(req.queryParams("token"))){
+                        Hashtable<String, String> getRideResult = new Hashtable<>();
+                        getRideResult.put("Status", "-1");
+                        return getRideResult;
+                    }
                     return rideSuggestionDAO.getRide(Integer.parseInt(req.queryParams("rideId")));
                 },
                 JsonUtil.json());
@@ -102,9 +111,9 @@ public class RidesharingAPI {
                     int userId = Integer.parseInt(req.queryParams("userId"));
                     String token = tokenDAO.getToken(userId);
                     if (token == null || !token.equals(req.queryParams("token"))){
-                        Hashtable<String, String> getUserResult = new Hashtable<>();
-                        getUserResult.put("Status", "-1");
-                        return getUserResult;
+                        Hashtable<String, String> joinRideResult = new Hashtable<>();
+                        joinRideResult.put("Status", "-1");
+                        return joinRideResult;
                     }
                     return sharedRideDAO.joinRide(Integer.parseInt(req.queryParams("rideId")), userId, 1) ;
                 },
@@ -113,8 +122,11 @@ public class RidesharingAPI {
         post("/unjoinRide", (req, res) -> {
                     int userId = Integer.parseInt(req.queryParams("userId"));
                     String token = tokenDAO.getToken(userId);
-                    if (!token.equals(req.queryParams("token")))
-                        return -1;
+                    if (token == null || !token.equals(req.queryParams("token"))){
+                        Hashtable<String, String> unjoinRideResult = new Hashtable<>();
+                        unjoinRideResult.put("Status", "-1");
+                        return unjoinRideResult;
+                    }
                     return sharedRideDAO.delete(Integer.parseInt(req.queryParams("rideId")),Integer.parseInt(req.queryParams("userId")));
                 },
                 JsonUtil.json());
