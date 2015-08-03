@@ -1,6 +1,7 @@
 import spark.Spark;
 
 import java.sql.Timestamp;
+import java.util.Hashtable;
 
 import static spark.Spark.*;
 
@@ -41,7 +42,7 @@ public class RidesharingAPI {
 
         post("/getRidesList", (req, res) -> {
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
-            if (!token.equals(req.queryParams("token")))
+            if (token == null || !token.equals(req.queryParams("token")))
                 return -1;
             return rideSuggestionDAO.getRides(Integer.parseInt(req.queryParams("userId")));
         }, JsonUtil.json());
@@ -60,11 +61,13 @@ public class RidesharingAPI {
         post("/login", (req, res) -> tokenDAO.login(req.queryParams("login"), req.queryParams("password")),
                 JsonUtil.json());
 
-        //todo change result 0/-1
         post("/getCurrentUser", (req, res) -> {
                     String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
-                    if (!token.equals(req.queryParams("token")))
-                        return -1;
+                    if (token == null || !token.equals(req.queryParams("token"))){
+                        Hashtable<String, String> getUserResult = new Hashtable<>();
+                        getUserResult.put("Status", "-1");
+                        return getUserResult;
+                        }
                     return userDAO.getUser(Integer.parseInt(req.queryParams("rideId")));
                 },
                 JsonUtil.json());

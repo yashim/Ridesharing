@@ -71,13 +71,16 @@ public class UserDAO {
         return user;
     }
 //todo change result
-    public User getUser(Integer id) {
+    public Hashtable<String, Object> getUser(Integer userId) {
+
+        Hashtable<String, Object> getUserResult = new Hashtable<>();
+        getUserResult.put("Status","-1");
         ResultSet rs = null;
         User user = null;
         try {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("select * from users where user_id=?");
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, userId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
             user = new User();
@@ -88,6 +91,8 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setPhone(rs.getString("phone"));
             }
+            getUserResult.replace("Status", "0");
+            getUserResult.put("User", user);
         } catch (SQLException e) {
             //TODO
             e.printStackTrace();
@@ -96,7 +101,7 @@ public class UserDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return user;
+        return getUserResult;
     }
 
     public int update (User user)  {

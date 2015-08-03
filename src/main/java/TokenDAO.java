@@ -26,12 +26,13 @@ public class TokenDAO {
                 passwordDb = rs.getString("password");
                 userId = rs.getInt("user_id");
             }
-            if (passwordDb.equals(password)){
-                loginResult.replace("Status", "0");
-                loginResult.put("Token", createToken(userId));
-                loginResult.put("UserId", Integer.toString(userId));
+            if (userId==-1 || passwordDb == null || !passwordDb.equals(password))
                 return loginResult;
-            }
+            loginResult.replace("Status", "0");
+            loginResult.put("Token", createToken(userId));
+            loginResult.put("UserId", Integer.toString(userId));
+            return loginResult;
+
         } catch (SQLException e) {
             //todo
             e.printStackTrace();

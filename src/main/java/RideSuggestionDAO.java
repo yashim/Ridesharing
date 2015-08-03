@@ -297,7 +297,7 @@ public class RideSuggestionDAO {
                 rideDetails.setFreeSeatsNumber(rs.getInt("free_seats_number"));
             }
             UserDAO userDAO = new UserDAO();
-            User user = userDAO.getUser(rideDetails.getUserId());
+            User user = (User) userDAO.getUser(rideDetails.getUserId()).get("User");
             rideDetails.setDriverLastName(user.getLastName());
             rideDetails.setDriverName(user.getFirstName());
             rideDetails.setDriverPhone(user.getPhone());
