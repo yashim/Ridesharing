@@ -10,7 +10,7 @@ import java.util.List;
 public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
-//todo decrease seats_amount
+//todo decrease seats_amount and check foreign key: ride_suggestion_id
     public Hashtable<String, String> joinRide(int rideSuggestionId, int userId, int seatsAmount) {
         ResultSet generatedKeys;
         Hashtable<String, String> joinRideResult = new Hashtable<>();

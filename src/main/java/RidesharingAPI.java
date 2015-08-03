@@ -101,8 +101,11 @@ public class RidesharingAPI {
         post("/joinRide", (req, res) -> {
                     int userId = Integer.parseInt(req.queryParams("userId"));
                     String token = tokenDAO.getToken(userId);
-                    if (!token.equals(req.queryParams("token")))
-                        return -1;
+                    if (token == null || !token.equals(req.queryParams("token"))){
+                        Hashtable<String, String> getUserResult = new Hashtable<>();
+                        getUserResult.put("Status", "-1");
+                        return getUserResult;
+                    }
                     return sharedRideDAO.joinRide(Integer.parseInt(req.queryParams("rideId")), userId, 1) ;
                 },
                 JsonUtil.json());
