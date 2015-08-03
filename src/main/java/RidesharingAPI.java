@@ -31,8 +31,11 @@ public class RidesharingAPI {
 
         post("/createRide", (req, res) -> {
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
-            if (!token.equals(req.queryParams("token")))
-                return -1;
+            if (token == null || !token.equals(req.queryParams("token"))){
+                Hashtable<String, String> getUserResult = new Hashtable<>();
+                getUserResult.put("Status", "-1");
+                return getUserResult;
+            }
             return rideSuggestionDAO.createRideSuggestion(
                     new RideSuggestion(Integer.parseInt(req.queryParams("userId")), req.queryParams("startPoint"),
                             req.queryParams("destinationPoint"), Timestamp.valueOf(req.queryParams("rideTime")),
@@ -42,8 +45,11 @@ public class RidesharingAPI {
 
         post("/getRidesList", (req, res) -> {
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
-            if (token == null || !token.equals(req.queryParams("token")))
-                return -1;
+            if (token == null || !token.equals(req.queryParams("token"))){
+                Hashtable<String, String> getUserResult = new Hashtable<>();
+                getUserResult.put("Status", "-1");
+                return getUserResult;
+            }
             return rideSuggestionDAO.getRides(Integer.parseInt(req.queryParams("userId")));
         }, JsonUtil.json());
 

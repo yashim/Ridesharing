@@ -13,10 +13,10 @@ public class RideSuggestionDAO {
 //todo add check for duplicate suggestions
 
 
-    public List<String> createRideSuggestion(RideSuggestion rideSuggestion) {
+    public Hashtable<String, String> createRideSuggestion(RideSuggestion rideSuggestion) {
         ResultSet generatedKeys;
-        List<String> result = new ArrayList<>();
-        result.add("-1");
+        Hashtable<String, String> createRideResult = new Hashtable<>();
+        createRideResult.put("Status", "-1");
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO ride_suggestions (user_id, start_point,destination_point, " +
@@ -36,8 +36,8 @@ public class RideSuggestionDAO {
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
-                result.set(0, "0");
-                result.add(Integer.toString(generatedKeys.getInt(1)));
+                createRideResult.replace("Status", "0");
+                createRideResult.put("RideId", Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
             //todo
@@ -46,7 +46,7 @@ public class RideSuggestionDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return result;
+        return createRideResult;
     }
 
     public RideSuggestion getRideSuggestion(String login) throws SQLException {
