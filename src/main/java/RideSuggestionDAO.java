@@ -125,14 +125,20 @@ public class RideSuggestionDAO {
         preparedStatement.execute();
     }
 
-    public int delete(int rideSuggestionId){
-        int result = -1;
+    public Hashtable<String, String> delete(int rideSuggestionId, int userId){
+        Hashtable<String, String> deleteRideResult = new Hashtable<>();
+        deleteRideResult.put("Status", "-1");
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("DELETE FROM ride_suggestions where ride_suggestion_id=?");
+            preparedStatement = connection.prepareCall("DELETE FROM ride_suggestions WHERE ride_suggestion_id=? AND user_id=?");
             preparedStatement.setInt(1, rideSuggestionId);
-            preparedStatement.execute();
-            result = 0;
+            preparedStatement.setInt(2, userId);
+            int affectedRows = preparedStatement.executeUpdate();
+            SharedRideDAO sharedRideDAO = new SharedRideDAO();
+            sharedRideDAO.delete(rideSuggestionId);
+            if(affectedRows == 0)
+                return deleteRideResult;
+            deleteRideResult.replace("Status", "0");
         } catch (SQLException e) {
             //todo
             e.printStackTrace();
@@ -140,7 +146,7 @@ public class RideSuggestionDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return result;
+        return deleteRideResult;
     }
 
     public List<RideDetails> getRideSuggestionsWhereUserIsDriver(int userId) {

@@ -54,13 +54,14 @@ public class RidesharingAPI {
         }, JsonUtil.json());
 
         post("/cancelRide", (req, res) -> {
-            String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
+            int userId = Integer.parseInt(req.queryParams("userId"));
+            String token = tokenDAO.getToken(userId);
             if (token == null || !token.equals(req.queryParams("token"))){
                 Hashtable<String, String> cancelRideResult = new Hashtable<>();
                 cancelRideResult.put("Status", "-1");
                 return cancelRideResult;
             }
-            return rideSuggestionDAO.delete(Integer.parseInt(req.queryParams("rideId")));
+            return rideSuggestionDAO.delete(Integer.parseInt(req.queryParams("rideId")), userId);
         }, JsonUtil.json());
 
         post("/register", (req, res) ->

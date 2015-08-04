@@ -116,12 +116,29 @@ public class SharedRideDAO {
         return sharedRide;
     }
 
-    public int delete(int rideId, int userId) {
+    public int delete(int rideSuggestionId) {
+        int result = -1;
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("DELETE FROM shared_rides where ride_suggestion_id=?");
+            preparedStatement.setInt(1, rideSuggestionId);
+            if(preparedStatement.executeUpdate() > 0)
+                result = 0;
+        } catch (SQLException e) {
+            //todo
+            e.printStackTrace();
+        } finally {
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return result;
+    }
+    public int delete(int rideSuggestionId, int userId) {
         int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("DELETE FROM shared_rides where ride_suggestion_id=? AND user_id=?");
-            preparedStatement.setInt(1, rideId);
+            preparedStatement.setInt(1, rideSuggestionId);
             preparedStatement.setInt(2, userId);
             preparedStatement.execute();
             result = 0;
