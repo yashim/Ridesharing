@@ -72,7 +72,6 @@ public class UserDAO {
     }
 //todo change result
     public Hashtable<String, Object> getUser(Integer userId) {
-
         Hashtable<String, Object> getUserResult = new Hashtable<>();
         getUserResult.put("Status","-1");
         ResultSet rs = null;
@@ -104,17 +103,19 @@ public class UserDAO {
         return getUserResult;
     }
 
-    public int update (User user)  {
+    public Hashtable<String, Object> update (User user, int userId)  {
+        Hashtable<String, Object> saveUserResult = new Hashtable<>();
+        saveUserResult.put("Status","-1");
         connection = ConnectionFactory.getConnection();
         try {
         preparedStatement = connection.prepareStatement(
-                "update users set" +
+                "UPDATE users SET" +
                         " login = ?," +
                         " password = ?," +
                         " first_name = ?," +
                         " last_name = ?," +
-                        " phone = ?," +
-                        " where login = ?;"
+                        " phone = ?" +
+                        " WHERE user_id = ?"
         );
 
         preparedStatement.setString(1, user.getLogin());
@@ -122,14 +123,16 @@ public class UserDAO {
         preparedStatement.setString(3, user.getFirstName());
         preparedStatement.setString(4, user.getLastName());
         preparedStatement.setString(5, user.getPhone());
-        preparedStatement.setString(6, user.getLogin());
+        preparedStatement.setInt(6, userId);
 
-        preparedStatement.execute();
+        int affectedRows = preparedStatement.executeUpdate();
+        if(affectedRows > 0)
+            saveUserResult.replace("Status", "0");
         } catch (SQLException e) {
             //todo
             e.printStackTrace();
         }
-        return 0;
+        return saveUserResult;
     }
     public void delete(int id) throws SQLException {
         try {

@@ -84,14 +84,15 @@ public class RidesharingAPI {
 
         //todo change result 0/-1
         post("/saveProfile", (req, res) -> {
-                    String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
+                    int userId = Integer.parseInt(req.queryParams("userId"));
+                    String token = tokenDAO.getToken(userId);
                     if (token == null || !token.equals(req.queryParams("token"))){
                         Hashtable<String, String> saveProfileResult = new Hashtable<>();
                         saveProfileResult.put("Status", "-1");
                         return saveProfileResult;
                     }
                     return userDAO.update(new User(req.queryParams("login"), req.queryParams("password"),
-                            req.queryParams("firstName"), req.queryParams("lastName"), req.queryParams("phone")));
+                            req.queryParams("firstName"), req.queryParams("lastName"), req.queryParams("phone")), userId);
                 },
                 JsonUtil.json());
 
