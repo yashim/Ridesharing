@@ -81,7 +81,7 @@ public class RidesharingAPI {
                         registerResult.put("Status", "-1");
                         return registerResult;
                     }
-                    return JsonUtil.toJson(userDAO.createUser(new User(login, password, firstName, lastName, phone)));
+                    return (userDAO.createUser(new User(login, password, firstName, lastName, phone)));
                 },
                 JsonUtil.json());
 
