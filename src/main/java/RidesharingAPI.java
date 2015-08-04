@@ -1,3 +1,5 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Spark;
 
 import java.sql.Timestamp;
@@ -7,6 +9,8 @@ import static spark.Spark.*;
 
 
 public class RidesharingAPI {
+
+    private final Logger logger = LogManager.getLogger(ConnectionFactory.class);
 
     public RidesharingAPI(final UserDAO userDAO, final RideSuggestionDAO rideSuggestionDAO,
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO) {
@@ -65,8 +69,21 @@ public class RidesharingAPI {
         }, JsonUtil.json());
 
         post("/register", (req, res) ->
-                JsonUtil.toJson(userDAO.createUser(new User(req.queryParams("login"), req.queryParams("password"),
-                        req.queryParams("firstName"), req.queryParams("lastName"), req.queryParams("phone")))));
+                {
+                    logger.info("Register user");
+                    String login = req.queryParams("login");
+                    String password = req.queryParams("password");
+                    String firstName = req.queryParams("firstName");
+                    String lastName = req.queryParams("lastName");
+                    String phone = req.queryParams("phone");
+                    if ( login==null || password == null || firstName == null || lastName == null || phone == null ){
+                        Hashtable<String, String> registerResult = new Hashtable<>();
+                        registerResult.put("Status", "-1");
+                        return registerResult;
+                    }
+                    return JsonUtil.toJson(userDAO.createUser(new User(login, password, firstName, lastName, phone)));
+                },
+                JsonUtil.json());
 
         post("/login", (req, res) -> tokenDAO.login(req.queryParams("login"), req.queryParams("password")),
                 JsonUtil.json());
