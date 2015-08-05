@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.util.Hashtable;
 
@@ -6,11 +9,12 @@ import java.util.Hashtable;
  * Creation date: 4/18/14.
  */
 public class UserDAO {
+    private final Logger logger = LogManager.getLogger(UserDAO.class);
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
     public Hashtable<String, String> createUser(User user) {
-        ResultSet generatedKeys = null;
+        ResultSet generatedKeys;
         Hashtable<String, String> createUserResult = new Hashtable<>();
         createUserResult.put("Status","-1");
         try {
@@ -34,8 +38,7 @@ public class UserDAO {
                 createUserResult.put("UserId",Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() +":"+ e.getMessage() + ":");
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
@@ -48,7 +51,7 @@ public class UserDAO {
         User user = null;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("select * from users where login=?");
+            preparedStatement = connection.prepareCall("SELECT * FROM users WHERE login=?");
             preparedStatement.setString(1, login);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -61,8 +64,7 @@ public class UserDAO {
                 user.setPhone(rs.getString("phone"));
             }
         } catch (SQLException e) {
-            //TODO
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -75,10 +77,10 @@ public class UserDAO {
         Hashtable<String, Object> getUserResult = new Hashtable<>();
         getUserResult.put("Status","-1");
         ResultSet rs = null;
-        User user = null;
+        User user;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("select * from users where user_id=?");
+            preparedStatement = connection.prepareCall("SELECT * FROM users WHERE user_id=?");
             preparedStatement.setInt(1, userId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -93,8 +95,7 @@ public class UserDAO {
             getUserResult.replace("Status", "0");
             getUserResult.put("User", user);
         } catch (SQLException e) {
-            //TODO
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -109,15 +110,7 @@ public class UserDAO {
         connection = ConnectionFactory.getConnection();
         try {
         preparedStatement = connection.prepareStatement(
-                "UPDATE users SET" +
-                        " login = ?," +
-                        " password = ?," +
-                        " first_name = ?," +
-                        " last_name = ?," +
-                        " phone = ?" +
-                        " WHERE user_id = ?"
-        );
-
+                "UPDATE users SET login = ?, password = ?, first_name = ?, last_name = ?, phone = ? WHERE user_id = ?");
         preparedStatement.setString(1, user.getLogin());
         preparedStatement.setString(2, user.getPassword());
         preparedStatement.setString(3, user.getFirstName());
@@ -129,8 +122,7 @@ public class UserDAO {
         if(affectedRows > 0)
             saveUserResult.replace("Status", "0");
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         }
         return saveUserResult;
     }

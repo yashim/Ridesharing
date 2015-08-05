@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -8,10 +11,9 @@ import java.util.List;
  * Creation date: 7/24/15.
  */
 public class RideSuggestionDAO {
+    private final Logger logger = LogManager.getLogger(RideSuggestionDAO.class);
     protected Connection connection;
     protected PreparedStatement preparedStatement;
-//todo add check for duplicate suggestions
-
 
     public Hashtable<String, String> createRideSuggestion(RideSuggestion rideSuggestion) {
         ResultSet generatedKeys;
@@ -40,8 +42,7 @@ public class RideSuggestionDAO {
                 createRideResult.put("RideId", Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
@@ -54,7 +55,7 @@ public class RideSuggestionDAO {
         RideSuggestion rideSuggestion = null;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("select * from ride_suggestions where ride_suggestions_id=?");
+            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions WHERE ride_suggestion_id=?");
             //TODO
             preparedStatement.setString(1, login);
             preparedStatement.execute();
@@ -83,7 +84,7 @@ public class RideSuggestionDAO {
         RideSuggestion rideSuggestion = null;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("select * from ride_suggestions where ride_suggestion_id=?");
+            preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions WHERE ride_suggestion_id=?");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -92,8 +93,7 @@ public class RideSuggestionDAO {
                 rideSuggestion = convertResultSetToRideSuggestion(rs);
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -105,15 +105,8 @@ public class RideSuggestionDAO {
     public void update(RideSuggestion rideSuggestion) throws SQLException {
         connection = ConnectionFactory.getConnection();
         preparedStatement = connection.prepareStatement(
-                "update ride_suggestions set" +
-                        " user_login = ?," +
-                        " start_point = ?," +
-                        " destination_point = ?," +
-                        " start_time_max = ?," +
-                        " capacity = ?," +
-                        " free_seats_number = ?," +
-                        " where ride_suggestion_id = ?;"
-        );
+                "UPDATE ride_suggestions SET user_id = ?, start_point = ?, destination_point = ?, ride_time = ?," +
+                        " capacity = ?, free_seats_number = ? WHERE ride_suggestion_id = ?");
         preparedStatement.setInt(1, rideSuggestion.getUserId());
         preparedStatement.setString(2, rideSuggestion.getStartPoint());
         preparedStatement.setString(3, rideSuggestion.getDestinationPoint());
@@ -140,8 +133,7 @@ public class RideSuggestionDAO {
                 return deleteRideResult;
             deleteRideResult.replace("Status", "0");
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
@@ -172,8 +164,7 @@ public class RideSuggestionDAO {
                 rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -206,8 +197,7 @@ public class RideSuggestionDAO {
                 rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -239,8 +229,7 @@ public class RideSuggestionDAO {
                 rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -248,7 +237,6 @@ public class RideSuggestionDAO {
         }
         return rideDetailsList;
     }
-
 
     private RideDetails convertResultSetToRideSuggestion(ResultSet rs) throws SQLException{
         RideDetails rideDetails = new RideDetails();
@@ -276,9 +264,6 @@ public class RideSuggestionDAO {
 
     }
 
-//    driverName
-//    driverLastName
-//    driverPhone
     public RideDetails getRide(int rideId) {
         ResultSet rs = null;
         RideDetails rideDetails = new RideDetails();
@@ -309,8 +294,7 @@ public class RideSuggestionDAO {
             rideDetails.setDriverPhone(user.getPhone());
 
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);

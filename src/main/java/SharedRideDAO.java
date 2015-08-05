@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -10,6 +13,8 @@ import java.util.List;
 public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
+    private final Logger logger = LogManager.getLogger(RideSuggestionDAO.class);
+
 //todo decrease seats_amount and check foreign key: ride_suggestion_id
     public Hashtable<String, String> joinRide(int rideSuggestionId, int userId, int seatsAmount) {
         ResultSet generatedKeys;
@@ -25,7 +30,7 @@ public class SharedRideDAO {
             preparedStatement.setInt(3, seatsAmount);
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Creating SharedRide failed, no rows affected.");
+                return joinRideResult;
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
@@ -33,8 +38,7 @@ public class SharedRideDAO {
                 joinRideResult.put("RideId", Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
@@ -47,7 +51,7 @@ public class SharedRideDAO {
         SharedRide sharedRide = null;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("select * from shared_rides where shared_ride_id=?");
+            preparedStatement = connection.prepareCall("SELECT * FROM shared_rides WHERE shared_ride_id=?");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -68,12 +72,8 @@ public class SharedRideDAO {
     public void update(SharedRide sharedRide) throws SQLException {
         connection = ConnectionFactory.getConnection();
         preparedStatement = connection.prepareStatement(
-                "update ride_suggestions set" +
-                        " ride_suggestion_id = ?," +
-                        " user_id = ?," +
-                        " seats_amount = ?," +
-                        " where shared_ride_id = ?;"
-        );
+                "UPDATE shared_rides SET ride_suggestion_id = ?, user_id = ?, seats_amount = ?" +
+                        " WHERE shared_ride_id = ?");
         preparedStatement.setInt(1, sharedRide.getRideSuggestionId());
         preparedStatement.setInt(2, sharedRide.getUserId());
         preparedStatement.setInt(2, sharedRide.getSeatsAmount());
@@ -98,8 +98,7 @@ public class SharedRideDAO {
                 sharedRideList.add(sharedRide);
             }
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -120,13 +119,12 @@ public class SharedRideDAO {
         int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("DELETE FROM shared_rides where ride_suggestion_id=?");
+            preparedStatement = connection.prepareCall("DELETE FROM shared_rides WHERE ride_suggestion_id=?");
             preparedStatement.setInt(1, rideSuggestionId);
             if(preparedStatement.executeUpdate() > 0)
                 result = 0;
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
@@ -137,14 +135,13 @@ public class SharedRideDAO {
         int result = -1;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("DELETE FROM shared_rides where ride_suggestion_id=? AND user_id=?");
+            preparedStatement = connection.prepareCall("DELETE FROM shared_rides WHERE ride_suggestion_id=? AND user_id=?");
             preparedStatement.setInt(1, rideSuggestionId);
             preparedStatement.setInt(2, userId);
             preparedStatement.execute();
             result = 0;
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);

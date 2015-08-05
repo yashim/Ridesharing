@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.util.Hashtable;
 import java.util.UUID;
@@ -7,6 +10,8 @@ import java.util.UUID;
  * Creation date: 4/18/14.
  */
 public class TokenDAO {
+    private final Logger logger = LogManager.getLogger(TokenDAO.class);
+
     protected Connection connection;
     protected PreparedStatement preparedStatement;
 
@@ -34,8 +39,7 @@ public class TokenDAO {
             return loginResult;
 
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
@@ -61,8 +65,7 @@ public class TokenDAO {
             }
             result = randomUUIDString;
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
@@ -83,8 +86,7 @@ public class TokenDAO {
                 token = rs.getString("token");
             }
         } catch (SQLException e) {
-            //TODO
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -97,11 +99,7 @@ public class TokenDAO {
         connection = ConnectionFactory.getConnection();
         String randomUUIDString = "-1";
         try {
-        preparedStatement = connection.prepareStatement(
-                "UPDATE tokens SET" +
-                        " token = ?," +
-                        " WHERE user_id = ?;"
-        );
+        preparedStatement = connection.prepareStatement("UPDATE tokens SET token = ? WHERE user_id = ?");
 
         UUID uuid = UUID.randomUUID();
         randomUUIDString = uuid.toString();
@@ -109,8 +107,7 @@ public class TokenDAO {
         preparedStatement.setInt(2, userId);
         preparedStatement.execute();
         } catch (SQLException e) {
-            //todo
-            e.printStackTrace();
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
         }
         return randomUUIDString;
     }
