@@ -20,20 +20,24 @@ public class RidesharingAPI {
             if (accessControlRequestHeaders != null) {
                 response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
             }
-
             String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
             if (accessControlRequestMethod != null) {
                 response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
             }
-
             return "OK";
         });
 
-        Spark.before((request,response)->{
-            response.header("Access-Control-Allow-Origin", "*");
-        });
+        Spark.before((request,response)-> response.header("Access-Control-Allow-Origin", "*"));
 
         post("/createRide", (req, res) -> {
+            if ( req.queryParams("userId")==null || req.queryParams("token") == null ||
+                    req.queryParams("startPoint")== null || req.queryParams("destinationPoint")==null ||
+                    req.queryParams("rideTime") == null || req.queryParams("timeLag")== null ||
+                    req.queryParams("capacity")==null ){
+                Hashtable<String, String> registerResult = new Hashtable<>();
+                registerResult.put("Status", "-1");
+                return registerResult;
+            }
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
             if (token == null || !token.equals(req.queryParams("token"))){
                 Hashtable<String, String> createRideResult = new Hashtable<>();
@@ -48,6 +52,11 @@ public class RidesharingAPI {
         }, JsonUtil.json());
 
         post("/getRidesList", (req, res) -> {
+            if ( req.queryParams("userId")==null || req.queryParams("token") == null ){
+                Hashtable<String, String> registerResult = new Hashtable<>();
+                registerResult.put("Status", "-1");
+                return registerResult;
+            }
             String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
             if (token == null || !token.equals(req.queryParams("token"))){
                 Hashtable<String, String> getRidesListResult = new Hashtable<>();
@@ -58,6 +67,12 @@ public class RidesharingAPI {
         }, JsonUtil.json());
 
         post("/cancelRide", (req, res) -> {
+            if ( req.queryParams("userId")==null || req.queryParams("token") == null ||
+                    req.queryParams("rideId") == null ){
+                Hashtable<String, String> registerResult = new Hashtable<>();
+                registerResult.put("Status", "-1");
+                return registerResult;
+            }
             int userId = Integer.parseInt(req.queryParams("userId"));
             String token = tokenDAO.getToken(userId);
             if (token == null || !token.equals(req.queryParams("token"))){
@@ -68,9 +83,8 @@ public class RidesharingAPI {
             return rideSuggestionDAO.delete(Integer.parseInt(req.queryParams("rideId")), userId);
         }, JsonUtil.json());
 
-        post("/register", (req, res) ->
-                {
-                    logger.info("Register user");
+        //TODO add email and phone format checks
+        post("/register", (req, res) ->{
                     String login = req.queryParams("login");
                     String password = req.queryParams("password");
                     String firstName = req.queryParams("firstName");
@@ -85,10 +99,25 @@ public class RidesharingAPI {
                 },
                 JsonUtil.json());
 
-        post("/login", (req, res) -> tokenDAO.login(req.queryParams("login"), req.queryParams("password")),
+        post("/login", (req, res) -> {
+                    String login = req.queryParams("login");
+                    String password = req.queryParams("password");
+                    if ( login==null || password == null ){
+                        Hashtable<String, String> registerResult = new Hashtable<>();
+                        registerResult.put("Status", "-1");
+                        return registerResult;
+                    }
+                    return tokenDAO.login(req.queryParams("login"), req.queryParams("password"));
+                },
                 JsonUtil.json());
 
         post("/getCurrentUser", (req, res) -> {
+                    if ( req.queryParams("userId")==null || req.queryParams("token") == null ||
+                            req.queryParams("rideId") == null){
+                        Hashtable<String, String> registerResult = new Hashtable<>();
+                        registerResult.put("Status", "-1");
+                        return registerResult;
+                    }
                     String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
                     if (token == null || !token.equals(req.queryParams("token"))){
                         Hashtable<String, String> getCurrentUserResult = new Hashtable<>();
@@ -99,8 +128,15 @@ public class RidesharingAPI {
                 },
                 JsonUtil.json());
 
-        //todo change result 0/-1
         post("/saveProfile", (req, res) -> {
+                    if ( req.queryParams("userId")==null || req.queryParams("token") == null ||
+                            req.queryParams("login") == null || req.queryParams("password")==null ||
+                            req.queryParams("firstName") == null || req.queryParams("lastName") == null ||
+                            req.queryParams("phone") == null){
+                        Hashtable<String, String> registerResult = new Hashtable<>();
+                        registerResult.put("Status", "-1");
+                        return registerResult;
+                    }
                     int userId = Integer.parseInt(req.queryParams("userId"));
                     String token = tokenDAO.getToken(userId);
                     if (token == null || !token.equals(req.queryParams("token"))){
@@ -115,6 +151,12 @@ public class RidesharingAPI {
 
 
         post("/getRide", (req, res) -> {
+                    if ( req.queryParams("userId")==null || req.queryParams("token") == null ||
+                            req.queryParams("rideId") == null ){
+                        Hashtable<String, String> registerResult = new Hashtable<>();
+                        registerResult.put("Status", "-1");
+                        return registerResult;
+                    }
                     String token = tokenDAO.getToken(Integer.parseInt(req.queryParams("userId")));
                     if (token == null || !token.equals(req.queryParams("token"))){
                         Hashtable<String, String> getRideResult = new Hashtable<>();
@@ -127,6 +169,12 @@ public class RidesharingAPI {
 
         //return sharedRideId or SuggestionId
         post("/joinRide", (req, res) -> {
+                    if ( req.queryParams("userId")==null || req.queryParams("token") == null ||
+                            req.queryParams("rideId") == null ){
+                        Hashtable<String, String> registerResult = new Hashtable<>();
+                        registerResult.put("Status", "-1");
+                        return registerResult;
+                    }
                     int userId = Integer.parseInt(req.queryParams("userId"));
                     String token = tokenDAO.getToken(userId);
                     if (token == null || !token.equals(req.queryParams("token"))){
@@ -139,6 +187,12 @@ public class RidesharingAPI {
                 JsonUtil.json());
 
         post("/unjoinRide", (req, res) -> {
+                    if ( req.queryParams("userId")==null || req.queryParams("token") == null ||
+                            req.queryParams("rideId") == null ){
+                        Hashtable<String, String> registerResult = new Hashtable<>();
+                        registerResult.put("Status", "-1");
+                        return registerResult;
+                    }
                     int userId = Integer.parseInt(req.queryParams("userId"));
                     String token = tokenDAO.getToken(userId);
                     if (token == null || !token.equals(req.queryParams("token"))){
@@ -153,6 +207,7 @@ public class RidesharingAPI {
         after((req, res) -> res.type("application/json"));
 
         exception(IllegalArgumentException.class, (e, req, res) -> {
+            logger.error(e.getMessage());
             res.status(400);
             res.body(JsonUtil.toJson(new ResponseError(e)));
         });
