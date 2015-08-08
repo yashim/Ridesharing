@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static spark.Spark.*;
 
@@ -77,15 +79,22 @@ public class RidesharingAPI {
             return rideSuggestionDAO.delete(Integer.parseInt(req.queryParams("rideId")), userId);
         }, JsonUtil.json());
 
-        //TODO add email and phone format checks
         post("/register", (req, res) ->{
                     Hashtable<String, String> registerResult = new Hashtable<>();
                     registerResult.put("Status", "-1");
                     if(isNull(Arrays.asList("login", "password","firstName", "lastName", "phone"), req)){
                         return registerResult;
                     }
+                    if (!checkEmailFormat(req.queryParams("login"))){
+                        return registerResult;
+                    }
+                    String phone = req.queryParams("phone");
+                    phone = phone.replace("-","").replace("(","").replace(")","").replace(" ","").replace("+","");
+                    if (!checkPhoneFormat(phone)) {
+                        return registerResult;
+                    }
                     return (userDAO.createUser(new User(req.queryParams("login"), req.queryParams("password"),
-                            req.queryParams("firstName"), req.queryParams("lastName"), req.queryParams("phone"))));
+                            req.queryParams("firstName"), req.queryParams("lastName"), phone)));
                 },
                 JsonUtil.json());
 
@@ -192,13 +201,19 @@ public class RidesharingAPI {
         return false;
     }
 
-    private boolean checkEmailFormat(String email){
-        //TODO
-        return true;
+    private boolean checkEmailFormat(final String email){
+        final String EMAIL_PATTERN =
+                "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                        + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
     private boolean checkPhoneFormat(String phone){
-        //TODO 
-        return true;
+        final String PHONE_PATTERN = "\\d{11}";
+        Pattern pattern = Pattern.compile(PHONE_PATTERN);
+        Matcher matcher = pattern.matcher(phone);
+        return matcher.matches();
     }
 }
