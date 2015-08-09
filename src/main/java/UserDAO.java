@@ -89,7 +89,7 @@ public class UserDAO {
                 user.setFirstName(rs.getString("first_name"));
                 user.setLastName(rs.getString("last_name"));
                 user.setLogin(rs.getString("login"));
-                user.setPassword(rs.getString("password"));
+                user.setPassword("");
                 user.setPhone(rs.getString("phone"));
             }
             getUserResult.replace("Status", "0");
@@ -110,13 +110,13 @@ public class UserDAO {
         connection = ConnectionFactory.getConnection();
         try {
         preparedStatement = connection.prepareStatement(
-                "UPDATE users SET login = ?, password = ?, first_name = ?, last_name = ?, phone = ? WHERE user_id = ?");
+                "UPDATE users SET login = ?, first_name = ?, last_name = ?, phone = ? WHERE user_id = ?");
         preparedStatement.setString(1, user.getLogin());
-        preparedStatement.setString(2, user.getPassword());
-        preparedStatement.setString(3, user.getFirstName());
-        preparedStatement.setString(4, user.getLastName());
-        preparedStatement.setString(5, user.getPhone());
-        preparedStatement.setInt(6, userId);
+//        preparedStatement.setString(2, user.getPassword());
+        preparedStatement.setString(2, user.getFirstName());
+        preparedStatement.setString(3, user.getLastName());
+        preparedStatement.setString(4, user.getPhone());
+        preparedStatement.setInt(5, userId);
 
         int affectedRows = preparedStatement.executeUpdate();
         if(affectedRows > 0)
@@ -126,6 +126,38 @@ public class UserDAO {
         }
         return saveUserResult;
     }
+
+    public Hashtable<String, Object> updatePassword (String oldPassword, String newPassword, int userId)  {
+        ResultSet rs;
+        Hashtable<String, Object> updatePasswordResult = new Hashtable<>();
+        updatePasswordResult.put("Status","-1");
+        connection = ConnectionFactory.getConnection();
+        try {
+            preparedStatement = connection.prepareCall("SELECT password FROM users WHERE user_id=?");
+            preparedStatement.setInt(1, userId);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+            String passwordDb = "";
+            while (rs.next()) {
+                passwordDb = rs.getString("password");
+            }
+            if (passwordDb == null || !passwordDb.equals(oldPassword))
+                return updatePasswordResult;
+
+            preparedStatement = connection.prepareStatement(
+                    "UPDATE users SET password = ? WHERE user_id = ?");
+            preparedStatement.setString(1, newPassword);
+            preparedStatement.setInt(2, userId);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if(affectedRows > 0)
+                updatePasswordResult.replace("Status", "0");
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        }
+        return updatePasswordResult;
+    }
+
     public void delete(int id) throws SQLException {
         try {
             connection = ConnectionFactory.getConnection();
