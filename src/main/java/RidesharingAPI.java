@@ -89,7 +89,15 @@ public class RidesharingAPI {
         post("/register", (req, res) ->{
 //                    try {
 //                        sendPush();
-////                        sendPush1();
+//                    try {
+//                        sendPush("Test Message", DeviceType.IOS, "tokentokentokentoken");
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        System.out.println(e.getMessage());
+//                        System.out.println(e.getLocalizedMessage());
+//                        System.out.println(e.toString());
+//                        //System.Diagnostics.Debug.WriteLine(new StreamReader(ex.Response.GetResponseStream()).ReadToEnd());
+//                    }
 //                    } catch (IOException e) {
 //                        e.printStackTrace();
 //                    }
@@ -252,7 +260,91 @@ public class RidesharingAPI {
         Matcher matcher = pattern.matcher(phone);
         return matcher.matches();
     }
-    private boolean sendPush() throws IOException {
+
+    private Hashtable<DeviceType, String> getDeviceInfo(String userId){
+        Hashtable<DeviceType, String> resultDeviceInfo = new Hashtable<>();
+        resultDeviceInfo.put(DeviceType.ANDROID, "");
+
+
+
+        return resultDeviceInfo;
+    }
+
+    private boolean sendPush(String message, DeviceType deviceType, String tokens) throws IOException {
+        String contents;
+        switch (deviceType){
+            case IOS:{
+                contents = "{"
+                        + "\"app_id\": \"32fed59e-3b83-11e5-b5c8-9f93493279d9\","
+                        + "\"contents\": {\"en\": \"" + message + "\"},"
+                        +"\"include_ios_tokens\": " + tokens + ", "
+                        + "\"isIos\": true"
+                        + "}";
+                break;
+            }
+            case ANDROID:{
+                contents = "{"
+                        + "\"app_id\": \"32fed59e-3b83-11e5-b5c8-9f93493279d9\","
+                        + "\"contents\": {\"en\": \""+ message +"\"},"
+                        +"\"include_android_reg_ids\": " + tokens + ", "
+                        + "\"isAndroid\": true"
+                        + "}";
+                break;
+            }
+            case WINDOWS_PHONE:{
+                contents = "{"
+                        + "\"app_id\": \"32fed59e-3b83-11e5-b5c8-9f93493279d9\","
+                        + "\"contents\": {\"en\": \""+ message +"\"},"
+                        +"\"include_wp_uris\": " + tokens + ", "
+                        + "\"isWP:\": true"
+                        + "}";
+                break;
+            }
+            default:
+                return false;
+        }
+
+        String url = "https://onesignal.com/api/v1/notifications";
+        String method = "POST";
+        String contentType = "application/json";
+
+        URL u = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection)u.openConnection();
+        conn.setRequestMethod(method);
+        conn.setRequestProperty("Content-Type", contentType);
+        conn.setRequestProperty("Content-Length", ""+contents.length());
+        conn.setUseCaches(false);
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+
+        conn.setRequestProperty("Authorization", "Basic " + "MzJmZWQ2MmEtM2I4My0xMWU1LWI1YzktNWY1MTUzMGI2Y2Fi");
+
+
+        OutputStream os = conn.getOutputStream();
+        DataOutputStream wr = new DataOutputStream(os);
+        wr.writeBytes (contents);
+        wr.flush ();
+        wr.close ();
+
+        try {
+
+            InputStream is = conn.getInputStream();
+
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+        String line;
+        StringBuffer response = new StringBuffer();
+        while((line = rd.readLine()) != null) {
+            response.append(line);
+            response.append('\r');
+        }
+        rd.close();
+        }catch(IOException e){
+
+        }
+        return true;
+    }
+
+    private boolean sendPushback(String message) throws IOException {
         HttpClient client = HttpClientBuilder.create().build();
         String url = "https://gamethrive.com/api/v1/notifications";
         HttpPost post = new HttpPost(url);
@@ -275,7 +367,7 @@ public class RidesharingAPI {
                 + "\"data\": {\"foo\": \"bar\"},"
 //                + "\"isIos\": true, "
                 //+ "\"send_after\": \"Fri May 02 2015 00:00:00 GMT-0700 (PDT)\","
-                + "\"contents\": {\"en\": \"Test Ridesharing Push\"}"
+                + "\"contents\": {\"en\": \"" + message + "\"}"
                 + "}";
         //System.out.println(jsonStr);
         //System.out.println(obj);
@@ -306,55 +398,6 @@ public class RidesharingAPI {
 //                .execute()
 //                .returnContent();
 
-        return true;
-    }
-    private boolean sendPush1() throws IOException {
-        String contents = "{ " +
-//                "\"app_id\" : \"32fed59e-3b83-11e5-b5c8-9f93493279d9\", " +
-//                "\"contents\" : {\"en\" : \"Java test\"}, " +
-//                "\"isAndroid\" : true, " +
-////                "\"url\" : \"http://www.google.es\", " +
-////                "\"included_segments\" : [ \"All\" ] " +
-//                "}";
-
-        "{"
-                + "\"app_id\": \"32fed59e-3b83-11e5-b5c8-9f93493279d9\","
-                + "\"contents\": {\"en\": \"English Message\"},"
-                + "\"included_segments\": [\"All\"],"
-                + "\"isAndroid\": true,"
-                + "\"isIos\": true,"
-                + "\"send_after\": \"Fri May 02 2015 00:00:00 GMT-0700 (PDT)\"}";
-        String url = "https://gamethrive.com/api/v1/notifications";
-        String method = "POST";
-        String contentType = "application/json";
-
-        URL u = new URL(url);
-        HttpURLConnection conn = (HttpURLConnection)u.openConnection();
-        conn.setRequestMethod(method);
-        conn.setRequestProperty("Content-Type", contentType);
-        conn.setRequestProperty("Content-Length", ""+contents.length());
-        conn.setUseCaches(false);
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-
-        conn.setRequestProperty("Authorization", "Basic " + "MzJmZWQ2MmEtM2I4My0xMWU1LWI1YzktNWY1MTUzMGI2Y2Fi");
-
-        OutputStream os = conn.getOutputStream();
-        DataOutputStream wr = new DataOutputStream(os);
-        wr.writeBytes (contents);
-        wr.flush ();
-        wr.close ();
-
-
-        InputStream is = conn.getInputStream();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-        String line;
-        StringBuffer response = new StringBuffer();
-        while((line = rd.readLine()) != null) {
-            response.append(line);
-            response.append('\r');
-        }
-        rd.close();
         return true;
     }
 }
