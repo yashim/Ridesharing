@@ -13,7 +13,7 @@ import java.util.List;
 public class SharedRideDAO {
     protected Connection connection;
     protected PreparedStatement preparedStatement;
-    private final Logger logger = LogManager.getLogger(RideSuggestionDAO.class);
+    private final Logger logger = LogManager.getLogger(SharedRideDAO.class);
 
 //todo decrease seats_amount and check foreign key: ride_suggestion_id
     public Hashtable<String, String> joinRide(int rideSuggestionId, int userId, int seatsAmount) {

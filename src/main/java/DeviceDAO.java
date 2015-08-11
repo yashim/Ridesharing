@@ -44,7 +44,6 @@ public class DeviceDAO {
         }
         return createUserResult;
     }
-
     public Device getDevice(int deviceId) {
         ResultSet rs = null;
         Device device = new Device();
@@ -113,7 +112,6 @@ public class DeviceDAO {
         }
         return saveUserResult;
     }
-
     public Hashtable<String, String> delete(int deviceid){
         Hashtable<String, String> deleteRideResult = new Hashtable<>();
         deleteRideResult.put("Status", "-1");

@@ -11,6 +11,16 @@ CREATE TABLE ride_suggestions
     capacity INT NOT NULL,
     free_seats_number INT NOT NULL
 );
+
+CREATE TABLE devices
+(
+  device_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  token VARCHAR(255) NOT NULL,
+  os VARCHAR(255) NOT NULL,
+  registration_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 CREATE TABLE shared_rides
 (
     shared_ride_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
