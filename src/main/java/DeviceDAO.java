@@ -21,7 +21,7 @@ public class DeviceDAO {
         createUserResult.put("Status","-1");
         try {
             connection = ConnectionFactory.getConnection();
-            String sqlInsertReview = "INSERT INTO users (user_id, token, os) " +
+            String sqlInsertReview = "INSERT INTO devices (user_id, token, os) " +
                     "VALUES (?, ?, ?)";
             preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, device.getUserId());
