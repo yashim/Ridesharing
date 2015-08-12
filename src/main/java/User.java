@@ -5,6 +5,7 @@ public class User {
 	private String login;
     private String password;
     private String phone;
+    private int id;
 
     public User() {
     }
@@ -55,5 +56,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
  * Creation date: 8/2/15.
  */
 public class RideDetails extends RideSuggestion {
+    private String id;
     private String driverName;
     private String driverLastName;
     private String driverPhone;
@@ -30,6 +31,14 @@ public class RideDetails extends RideSuggestion {
         this.driverName = driverName;
         this.driverLastName = driverLastName;
         this.driverPhone = driverPhone;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDriverName() {

@@ -75,5 +75,10 @@
             <artifactId>json</artifactId>
             <version>20140107</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.jetty</groupId>-->
+            <!--<artifactId>jetty-client</artifactId>-->
+            <!--<version>8.1.14.v20131031</version>-->
+        <!--</dependency>-->
     </dependencies>
 </project>

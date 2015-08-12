@@ -46,6 +46,37 @@ public class SharedRideDAO {
         return joinRideResult;
     }
 
+    public Hashtable<String, String> joinRideFromTelegram(int rideSuggestionId, int userId, int seatsAmount) {
+        ResultSet generatedKeys;
+        Hashtable<String, String> joinRideResult = new Hashtable<>();
+        joinRideResult.put("Status", "-1");
+        try {
+            connection = ConnectionFactory.getConnection();
+            String sqlInsertReview = "INSERT INTO shared_rides (ride_suggestion_id, user_id, seats_amount) " +
+                    "VALUES (?, ? ,?)";
+            preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, rideSuggestionId);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.setInt(3, seatsAmount);
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                return joinRideResult;
+            }
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                joinRideResult.replace("Status", "0");
+                joinRideResult.put("RideId", Integer.toString(generatedKeys.getInt(1)));
+            }
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } finally {
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return joinRideResult;
+    }
+
+
     public SharedRide getSharedRide(int id) throws SQLException {
         ResultSet rs = null;
         SharedRide sharedRide = null;

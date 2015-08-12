@@ -46,13 +46,58 @@ public class UserDAO {
         return createUserResult;
     }
 
-    public User getUser(String login) {
+    public Hashtable<String, String> createUserFromTelegram(User user, int chatId) {
+        ResultSet generatedKeys;
+        Hashtable<String, String> createUserResult = new Hashtable<>();
+        createUserResult.put("Status","-1");
+        try {
+            connection = ConnectionFactory.getConnection();
+            String sqlInsertReview = "INSERT INTO users (first_name, last_name,login, password, phone, chat_id, is_telegram) " +
+                    "VALUES (?, ? ,? ,?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, user.getFirstName());
+            preparedStatement.setString(2, user.getLastName());
+            preparedStatement.setString(3, Integer.toString(chatId));
+            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(5, user.getPhone());
+            preparedStatement.setInt(6, chatId);
+            preparedStatement.setBoolean(7, true);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating user failed, no rows affected.");
+            }
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                createUserResult.replace("Status", "0");
+                createUserResult.put("UserId",Integer.toString(generatedKeys.getInt(1)));
+            }
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() +":"+ e.getMessage() + ":");
+        } finally {
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return createUserResult;
+    }
+
+    public boolean exist(int chatId) throws SQLException {
+        ResultSet result = null;
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("SELECT 1 FROM users WHERE chat_id =?");
+            preparedStatement.setInt(1, chatId);
+            preparedStatement.execute();
+            result = preparedStatement.getResultSet();
+        return result.next();
+    }
+
+    public User getUser(int chatId) {
         ResultSet rs = null;
         User user = null;
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("SELECT * FROM users WHERE login=?");
-            preparedStatement.setString(1, login);
+            preparedStatement = connection.prepareCall("SELECT * FROM users WHERE chat_id=?");
+            preparedStatement.setInt(1, chatId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
             user = new User();
@@ -62,6 +107,7 @@ public class UserDAO {
                 user.setLogin(rs.getString("login"));
                 user.setPassword(rs.getString("password"));
                 user.setPhone(rs.getString("phone"));
+                user.setId(rs.getInt("user_id"));
             }
         } catch (SQLException e) {
             logger.error(e.getErrorCode() + ":" + e.getMessage());
@@ -158,6 +204,31 @@ public class UserDAO {
         return updatePasswordResult;
     }
 
+    public boolean updatePhone (String phone, int chatId)  {
+        connection = ConnectionFactory.getConnection();
+        try {
+            preparedStatement = connection.prepareStatement("UPDATE users SET phone = ? WHERE chat_id = ?");
+            preparedStatement.setString(1, phone);
+            preparedStatement.setInt(2, chatId);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if(affectedRows > 0)
+                return true;
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+
+        }
+        return false;
+    }
+    public boolean checkPhone(int chatId){
+        User user = getUser(chatId);
+        if( user.getPhone()==null || user.getPhone().equals("")){
+            return false;
+        }
+        return true;
+    }
+
+
     public void delete(int id) throws SQLException {
         try {
             connection = ConnectionFactory.getConnection();
@@ -170,7 +241,6 @@ public class UserDAO {
             DbUtil.close(connection);
         }
     }
-
 
     public boolean exist (String login) throws SQLException {
         connection = ConnectionFactory.getConnection();

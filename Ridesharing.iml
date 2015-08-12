@@ -20,6 +20,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:8.1.14.v20131031" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-client:8.1.14.v20131031" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:fluent-hc:4.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.1" level="project" />
