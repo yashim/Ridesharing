@@ -57,7 +57,7 @@ public class UserDAO {
             preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
-            preparedStatement.setString(3, Integer.toString(chatId));
+            preparedStatement.setString(3, user.getLogin());
             preparedStatement.setString(4, user.getPassword());
             preparedStatement.setString(5, user.getPhone());
             preparedStatement.setInt(6, chatId);
@@ -91,7 +91,7 @@ public class UserDAO {
         return result.next();
     }
 
-    public User getUser(int chatId) {
+    public User getUserByChatId(int chatId) {
         ResultSet rs = null;
         User user = null;
         try {
@@ -108,6 +108,7 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setPhone(rs.getString("phone"));
                 user.setId(rs.getInt("user_id"));
+                user.setChatid(rs.getInt("chat_id"));
             }
         } catch (SQLException e) {
             logger.error(e.getErrorCode() + ":" + e.getMessage());
@@ -118,6 +119,37 @@ public class UserDAO {
         }
         return user;
     }
+
+    public User getUserById(int userId) {
+        ResultSet rs = null;
+        User user = null;
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("SELECT * FROM users WHERE user_id=?");
+            preparedStatement.setInt(1, userId);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+            user = new User();
+            while (rs.next()) {
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setLogin(rs.getString("login"));
+                user.setPassword(rs.getString("password"));
+                user.setPhone(rs.getString("phone"));
+                user.setId(rs.getInt("user_id"));
+                user.setChatid(rs.getInt("chat_id"));
+            }
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return user;
+    }
+
+
 //todo change result
     public Hashtable<String, Object> getUser(Integer userId) {
         Hashtable<String, Object> getUserResult = new Hashtable<>();
@@ -137,6 +169,7 @@ public class UserDAO {
                 user.setLogin(rs.getString("login"));
                 user.setPassword("");
                 user.setPhone(rs.getString("phone"));
+                user.setChatid(rs.getInt("chat_id"));
             }
             getUserResult.replace("Status", "0");
             getUserResult.put("User", user);
@@ -221,7 +254,7 @@ public class UserDAO {
         return false;
     }
     public boolean checkPhone(int chatId){
-        User user = getUser(chatId);
+        User user = getUserByChatId(chatId);
         if( user.getPhone()==null || user.getPhone().equals("")){
             return false;
         }

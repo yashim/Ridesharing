@@ -6,6 +6,7 @@ public class User {
     private String password;
     private String phone;
     private int id;
+    private int chatid;
 
     public User() {
     }
@@ -64,5 +65,13 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getChatid() {
+        return chatid;
+    }
+
+    public void setChatid(int chatid) {
+        this.chatid = chatid;
     }
 }

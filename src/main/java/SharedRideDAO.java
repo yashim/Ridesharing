@@ -37,6 +37,8 @@ public class SharedRideDAO {
                 joinRideResult.replace("Status", "0");
                 joinRideResult.put("RideId", Integer.toString(generatedKeys.getInt(1)));
             }
+//            RideSuggestionDAO rideSuggestionDAO = new RideSuggestionDAO();
+//            rideSuggestionDAO.decreaseSeatsAmount(rideSuggestionId, seatsAmount);
         } catch (SQLException e) {
             logger.error(e.getErrorCode() + ":" + e.getMessage());
         } finally {

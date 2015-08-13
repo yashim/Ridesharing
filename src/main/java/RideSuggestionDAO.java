@@ -78,7 +78,6 @@ public class RideSuggestionDAO {
         return rideSuggestion;
     }
 
-
     public RideSuggestion getRideSuggestion(int id) {
         ResultSet rs = null;
         RideSuggestion rideSuggestion = null;
@@ -117,6 +116,16 @@ public class RideSuggestionDAO {
 
         preparedStatement.execute();
     }
+
+    public void decreaseSeatsAmount(int suggestionId, int occupiedSeats) throws SQLException {
+        connection = ConnectionFactory.getConnection();
+        preparedStatement = connection.prepareStatement(
+                "UPDATE ride_suggestions SET free_seats_number = free_seats_number-? WHERE ride_suggestion_id = ?");
+        preparedStatement.setInt(1, occupiedSeats);
+        preparedStatement.setInt(2, suggestionId);
+        preparedStatement.execute();
+    }
+
 
     public Hashtable<String, String> delete(int rideSuggestionId, int userId){
         Hashtable<String, String> deleteRideResult = new Hashtable<>();
@@ -264,6 +273,17 @@ public class RideSuggestionDAO {
 
     }
 
+    public boolean exist(int rideId, int userId) throws SQLException {
+        ResultSet result = null;
+        connection = ConnectionFactory.getConnection();
+        preparedStatement = connection.prepareCall("SELECT 1 FROM ride_suggestions WHERE ride_suggestion_id =? AND user_id = ?");
+        preparedStatement.setInt(1, rideId);
+        preparedStatement.setInt(2, userId);
+        preparedStatement.execute();
+        result = preparedStatement.getResultSet();
+        return result.next();
+    }
+
     public RideDetails getRide(int rideId) {
         ResultSet rs = null;
         RideDetails rideDetails = new RideDetails();
@@ -288,10 +308,12 @@ public class RideSuggestionDAO {
                 rideDetails.setFreeSeatsNumber(rs.getInt("free_seats_number"));
             }
             UserDAO userDAO = new UserDAO();
-            User user = userDAO.getUser(rideDetails.getUserId());
+            User user = userDAO.getUserById(rideDetails.getUserId());
             rideDetails.setDriverLastName(user.getLastName());
             rideDetails.setDriverName(user.getFirstName());
             rideDetails.setDriverPhone(user.getPhone());
+            rideDetails.setChatId(user.getChatid());
+            rideDetails.setDriverLogin(user.getLogin());
 
         } catch (SQLException e) {
             logger.error(e.getErrorCode() + ":" + e.getMessage());

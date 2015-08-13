@@ -9,6 +9,8 @@ public class RideDetails extends RideSuggestion {
     private String driverName;
     private String driverLastName;
     private String driverPhone;
+    private String driverLogin;
+    private int chatId;
 
     public RideDetails() {
     }
@@ -63,5 +65,21 @@ public class RideDetails extends RideSuggestion {
 
     public void setDriverPhone(String driverPhone) {
         this.driverPhone = driverPhone;
+    }
+
+    public int getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(int chatId) {
+        this.chatId = chatId;
+    }
+
+    public String getDriverLogin() {
+        return driverLogin;
+    }
+
+    public void setDriverLogin(String driverLogin) {
+        this.driverLogin = driverLogin;
     }
 }
