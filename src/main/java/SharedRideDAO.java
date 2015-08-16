@@ -171,7 +171,10 @@ public class SharedRideDAO {
             preparedStatement = connection.prepareCall("DELETE FROM shared_rides WHERE ride_suggestion_id=? AND user_id=?");
             preparedStatement.setInt(1, rideSuggestionId);
             preparedStatement.setInt(2, userId);
-            preparedStatement.execute();
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                return result;
+            }
             result = 0;
         } catch (SQLException e) {
             logger.error(e.getErrorCode() + ":" + e.getMessage());

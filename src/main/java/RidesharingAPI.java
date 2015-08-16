@@ -22,11 +22,12 @@ import static spark.Spark.*;
 
 public class RidesharingAPI {
 
-    private final Logger logger = LogManager.getLogger(ConnectionFactory.class);
+    private final Logger logger = LogManager.getLogger(RidesharingAPI.class);
 
     public RidesharingAPI(final UserDAO userDAO, final RideSuggestionDAO rideSuggestionDAO,
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO, final DeviceDAO deviceDAO) {
-        Spark.setPort(8443);
+//        Spark.setSecure();
+        //Spark.setPort(8443);
         Spark.options("/*", (request, response) -> {
 
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -263,6 +264,8 @@ public class RidesharingAPI {
             JsonElement jsonElement = new JsonParser().parse(req.body());
             Message requestMessage = g.fromJson(jsonElement.getAsJsonObject().getAsJsonObject("message").toString(),
                     Message.class);
+            if(requestMessage.getText()==null)
+                return "OK";
             String text = requestMessage.getText().toLowerCase();
             int chatId = requestMessage.getChat().getId();
             String login = "";
@@ -406,9 +409,14 @@ public class RidesharingAPI {
                 int userId = userDAO.getUserByChatId(chatId).getId();
                 try {
                     if(rideSuggestionDAO.exist(rideId, userId)){
-                        rideSuggestionDAO.delete(rideId, userDAO.getUserByChatId(chatId).getId());
+                        if(rideSuggestionDAO.delete(rideId, userDAO.getUserByChatId(chatId).getId()).get("Status").equals("-1")){
+                            sendPost(requestMessage.getChat().getId(), "Sorry, you cannot cancel this ride", getReplyMarkup());
+                            return "OK";
+                        }
                     } else{
-                        sharedRideDAO.delete(rideId, userId);
+                        if(sharedRideDAO.delete(rideId, userId)==-1){
+                            sendPost(requestMessage.getChat().getId(), "Sorry, you cannot cancel this ride", getReplyMarkup());
+                            return "OK";                        }
                         //sendPost(requestMessage.getChat().getId(), "You successfully deleted a ride with ID:"+rideId+"!", getReplyMarkup());
                     }
                     sendPost(requestMessage.getChat().getId(), "You successfully canceled the ride with ID: "+rideId+"!", getReplyMarkup());
@@ -652,7 +660,6 @@ public class RidesharingAPI {
         responseMessage += "Driver: " + rideDetails.getDriverName() +" "+ rideDetails.getDriverLastName() + System.lineSeparator();
         //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideDetails.getRideTime()) + System.lineSeparator();
-        responseMessage += "************************" + System.lineSeparator();
         return responseMessage;
     }
     String formatGetRidesResponseWithRoute(RideDetails rideDetails){
@@ -662,7 +669,6 @@ public class RidesharingAPI {
         responseMessage += "Driver: " + rideDetails.getDriverName() +" "+ rideDetails.getDriverLastName() + System.lineSeparator();
         responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
         //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
-        responseMessage += "************************" + System.lineSeparator();
         return responseMessage;
     }
     String formatRideSuggestion(RideSuggestion rideSuggestion){
@@ -671,7 +677,6 @@ public class RidesharingAPI {
         responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideSuggestion.getRideTime()) + System.lineSeparator();
         responseMessage += "Route from " + rideSuggestion.getStartPoint().toUpperCase() +" to "+ rideSuggestion.getDestinationPoint().toUpperCase() + System.lineSeparator();
         //responseMessage += "Free seats number: " + rideSuggestion.getFreeSeatsNumber() + System.lineSeparator();
-        responseMessage += "************************" + System.lineSeparator();
         return responseMessage;
 
     }
