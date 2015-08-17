@@ -387,6 +387,7 @@ public class RidesharingAPI {
                 }else if(rideSuggestion.getDestinationPoint().equals("innopolis")){
                     rideSuggestion.setStartPoint("kazan");
                 }
+//
 //count seats
 //                if(params.length > 3){
 //                    int freeSearsAmount = Integer.parseInt(params[3]);
@@ -399,7 +400,7 @@ public class RidesharingAPI {
                 User user = userDAO.getUserByChatId(chatId);
                 if(user.getId()==0)
                     return "OK";
-                rideSuggestion.setUserId(userDAO.getUserByChatId(chatId).getId());
+                rideSuggestion.setUserId(user.getId());
                 String rideId = rideSuggestionDAO.createRideSuggestion(rideSuggestion).get("RideId");
                 if(rideId == null){
                     logger.error("rideId == null");

@@ -21,7 +21,7 @@ public class RideSuggestionDAO {
         createRideResult.put("Status", "-1");
         try {
             connection = ConnectionFactory.getConnection();
-            if(!exist(rideSuggestion.getRideSuggestionId(), rideSuggestion.getUserId(), rideSuggestion.getRideTime())){
+            if(exist(rideSuggestion.getRideSuggestionId(), rideSuggestion.getUserId(), rideSuggestion.getRideTime())){
                 return createRideResult;
             }
             String sqlInsertReview = "INSERT INTO ride_suggestions (user_id, start_point,destination_point, " +
