@@ -28,6 +28,7 @@ public class RidesharingAPI {
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO, final DeviceDAO deviceDAO) {
 //        Spark.setSecure();
         Spark.setPort(8443);
+        Gson g = new Gson();
         Spark.options("/*", (request, response) -> {
 
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -260,7 +261,6 @@ public class RidesharingAPI {
 
         post("/ridesharingBot", (req, res) -> {
             logger.info(req.body());
-            Gson g = new Gson();
             JsonElement jsonElement = new JsonParser().parse(req.body());
             Message requestMessage = g.fromJson(jsonElement.getAsJsonObject().getAsJsonObject("message").toString(),
                     Message.class);
@@ -291,14 +291,8 @@ public class RidesharingAPI {
                 return "OK";
             }
             if(text.startsWith("/show") || text.startsWith("show")) {
-                //todo change user id to login
-                User user = userDAO.getUserByChatId(requestMessage.getFrom().getId());
-                if(user == null){
-                    logger.error("user ==null");
-                    return "OK";
-                }
-                Hashtable<RideSuggestionType, List<RideDetails>> rides = rideSuggestionDAO.getRides(
-                        user.getId());
+                sendPost(chatId, "I am thinking... Please wait", getReplyMarkup());
+                Hashtable<RideSuggestionType, List<RideDetails>> rides = rideSuggestionDAO.getRidesByChatId(chatId);
                 List<RideDetails> upcomingRides = rides.get(RideSuggestionType.UNDEFINED);
                 String responseMessage = "";
                 if (upcomingRides.size() == 0) {
@@ -345,11 +339,11 @@ public class RidesharingAPI {
                 }
                 String[] params = text.split(" ");
                 if(params.length > 3){
-                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_WRONG_PARAMETERS, getReplyMarkup());
+                    sendPost(chatId, TelegramBotResponses.CREATE_WRONG_PARAMETERS, getReplyMarkup());
                     return "OK";
                 }
                 if(params.length <2){
-                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_SPECIFY_PARAMETERS, getReplyMarkup());
+                    sendPost(chatId, TelegramBotResponses.CREATE_SPECIFY_PARAMETERS, getReplyMarkup());
                     return "OK";
                 }
                 RideSuggestion rideSuggestion = new RideSuggestion();
@@ -357,7 +351,7 @@ public class RidesharingAPI {
                     rideSuggestion.setDestinationPoint(params[1].toLowerCase());
                 }
                 else {
-                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_WRONG_CITY, getReplyMarkup());
+                    sendPost(chatId, TelegramBotResponses.CREATE_WRONG_CITY, getReplyMarkup());
                     return "OK";
                 }
                 int hours = 0;
@@ -369,7 +363,7 @@ public class RidesharingAPI {
                     if(hours < 0 || hours > 24 || minutes < 0 || minutes > 60)
                         throw new NumberFormatException();
                 } catch (Exception e) {
-                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_WRONG_TIMEFORMAT, getReplyMarkup());
+                    sendPost(chatId, TelegramBotResponses.CREATE_WRONG_TIMEFORMAT, getReplyMarkup());
                     return "OK";
                 }
                 Calendar cal = Calendar.getInstance();
@@ -412,49 +406,42 @@ public class RidesharingAPI {
                         formatRideSuggestion(rideSuggestion), getReplyMarkup());
                 return "OK";
             }
-            //todo
+            //todo notify passengers
             if(text.startsWith("/cancel") || text.startsWith("cancel")){
                 if(requestMessage.getReplyToMessage()==null){
-                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.DELETE_INFO, getReplyMarkup());
+                    sendPost(chatId, TelegramBotResponses.DELETE_INFO, getReplyMarkup());
                     return "OK";
                 }
                 String replyMessage = requestMessage.getReplyToMessage().getText();
                 if(!replyMessage.startsWith("ID")){
-                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.DELETE_INFO, getReplyMarkup());
+                    sendPost(chatId, TelegramBotResponses.DELETE_INFO, getReplyMarkup());
                     return "OK";
                 }
                 int rideId = Integer.parseInt(replyMessage.substring(4, replyMessage.indexOf(System.lineSeparator())));
                 int userId = userDAO.getUserByChatId(chatId).getId();
                 try {
                     if(rideSuggestionDAO.exist(rideId, userId)){
-                        if(rideSuggestionDAO.delete(rideId, userDAO.getUserByChatId(chatId).getId()).get("Status").equals("-1")){
-                            sendPost(requestMessage.getChat().getId(), "Sorry, you cannot cancel this ride", getReplyMarkup());
+                        if(rideSuggestionDAO.delete(rideId, userId).get("Status").equals("-1")){
+                            sendPost(chatId, "Sorry, you cannot cancel this ride", getReplyMarkup());
                             return "OK";
                         }
                     } else{
                         if(sharedRideDAO.delete(rideId, userId)==-1){
-                            sendPost(requestMessage.getChat().getId(), "Sorry, you cannot cancel this ride", getReplyMarkup());
+                            sendPost(chatId, "Sorry, you cannot cancel this ride", getReplyMarkup());
                             return "OK";                        }
                         //sendPost(requestMessage.getChat().getId(), "You successfully deleted a ride with ID:"+rideId+"!", getReplyMarkup());
                     }
-                    sendPost(requestMessage.getChat().getId(), "You successfully canceled the ride with ID: "+rideId+"!", getReplyMarkup());
+                    sendPost(chatId, "You successfully canceled the ride with ID: "+rideId+"!", getReplyMarkup());
                 } catch (SQLException e) {
                     logger.error(e.getMessage());
                     return "OK";
                 }
                 return "OK";
-//
-//                //todo
-//                sendPost(requestMessage.getChat().getId(), "Your successfully deleted the ride with " +"username", getReplyMarkup());
-//                int driverChatId = rideSuggestionDAO.getRide(rideId).getChatId();
-//                //todo
-//                sendPost(driverChatId,  "usernamre"+ "joined to ride!", getReplyMarkup());
 
             }
             if(text.startsWith("/join") || text.startsWith("join")){
-                String responseMessage = "";
                 if(requestMessage.getReplyToMessage()==null){
-                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.JOIN_INFO, getReplyMarkup());
+                    sendPost(chatId, TelegramBotResponses.JOIN_INFO, getReplyMarkup());
                     return "OK";
                 }
                 if(requestMessage.getFrom().getUsername()==null || requestMessage.getFrom().getUsername()==""){
@@ -478,44 +465,7 @@ public class RidesharingAPI {
                 sendPost(rideDetails.getChatId(),  "@" + user.getLogin() +" "+user.getFirstName()+" "+ user.getLastName() + " joined your heaven-sent ride!", getReplyMarkup());
                 return "OK";
             }
-//            if(text.startsWith("/unjoinRide")){
-//                return "OK";
-//            }
-//            if(text.startsWith("/iseat") || text.startsWith("passenger") || text.startsWith("i seat") ){
-//                Hashtable<RideSuggestionType, List<RideDetails>> rides =  rideSuggestionDAO.getRides(
-//                        userDAO.getUserByChatId(requestMessage.getFrom().getId()).getId());
-//                List<RideDetails> upcomingRides = rides.get(RideSuggestionType.PASSENGER);
-//                String responseMessage = "";
-//                for(RideDetails rideDetails : upcomingRides){
-//                    responseMessage = formatGetRidesResponse(rideDetails);
-//                    sendPost(requestMessage.getChat().getId(), formatGetRidesResponseWithRoute(rideDetails), getReplyMarkup());
-//                }
-//                return "OK";
-//            }
-//            if(text.startsWith("/idrive") || text.startsWith("drive") || text.startsWith("i drive")){
-//                Hashtable<RideSuggestionType, List<RideDetails>> rides =  rideSuggestionDAO.getRides(
-//                        userDAO.getUserByChatId(requestMessage.getFrom().getId()).getId());
-//                List<RideDetails> upcomingRides = rides.get(RideSuggestionType.DRIVER);
-//                String responseMessage = "";
-//                for(RideDetails rideDetails : upcomingRides){
-//                    responseMessage = formatGetRidesResponse(rideDetails);
-//                    sendPost(requestMessage.getChat().getId(), formatGetRidesResponseWithRoute(rideDetails), getReplyMarkup());
-//                }
-//                return "OK";
-//            }
-//            if(text.startsWith("/setphone")){
-//                String phone;
-//                try {
-//                    String[] params = text.split(" ");
-//                    phone = params[1];
-//                }catch(Exception e)
-//                { return "OK";}
-//                phone = phone.replace("-","").replace("(","").replace(")","").replace(" ","").replace("+","");
-//                if(checkPhoneFormat(phone))
-//                    userDAO.updatePhone(phone, chatId);
-//                return "OK";
-//            }
-            sendPost(requestMessage.getChat().getId(), TelegramBotResponses.ERROR, getReplyMarkup());
+            sendPost(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
             return "OK";
         }, JsonUtil.json());
 

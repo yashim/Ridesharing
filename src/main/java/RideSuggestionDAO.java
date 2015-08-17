@@ -248,6 +248,96 @@ public class RideSuggestionDAO {
         return rideDetailsList;
     }
 
+    public List<RideDetails> getRideSuggestionsByChatIdWhereUserIsPassenger(int chatId) {
+        ResultSet rs = null;
+
+        List<RideDetails> rideDetailsList = new ArrayList<>();
+        try {
+            connection = ConnectionFactory.getConnection();
+            //todo add check for ride time
+            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, ride_suggestions.ride_suggestion_id,ride_suggestions.user_id, shared_rides.user_id, chat_id "+
+                    "FROM ride_suggestions " +
+                    "LEFT JOIN shared_rides ON ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
+                    "JOIN users ON users.user_id = ride_suggestions.user_id " +
+                    "WHERE shared_rides.user_id IS NOT NULL AND chat_id<>?");
+            preparedStatement.setInt(1, chatId);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+
+            while (rs.next()) {
+                RideDetails rideDetails = convertResultSetToRideDetails(rs);
+                rideDetailsList.add(rideDetails);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return rideDetailsList;
+    }
+
+    public List<RideDetails> getRideSuggestionsByChatIdWhereUserIsDriver(int chatId) {
+        ResultSet rs = null;
+
+        List<RideDetails> rideDetailsList = new ArrayList<>();
+        try {
+            connection = ConnectionFactory.getConnection();
+            //todo add check for ride time
+            preparedStatement = connection.prepareCall("SELECT DISTINCT users.last_name, users.first_name, users.phone, " +
+                    "start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, " +
+                    "ride_suggestions.ride_suggestion_id, ride_suggestions.user_id " +
+                    "FROM ride_suggestions " +
+                    "JOIN users ON users.user_id = ride_suggestions.user_id " +
+                    "WHERE chat_id=?");
+            preparedStatement.setInt(1, chatId);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+
+            while (rs.next()) {
+                RideDetails rideDetails = convertResultSetToRideDetails(rs);
+                rideDetailsList.add(rideDetails);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return rideDetailsList;
+    }
+
+    public List<RideDetails> getRideSuggestionsByChatIdMadeByOthers(int chatId) {
+        ResultSet rs = null;
+
+        List<RideDetails> rideDetailsList = new ArrayList<>();
+        try {
+            connection = ConnectionFactory.getConnection();
+            preparedStatement = connection.prepareCall("SELECT DISTINCT users.user_id, users.last_name, users.first_name, users.phone, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, ride_suggestions.ride_suggestion_id "+
+                    "FROM ride_suggestions " +
+                    "LEFT JOIN users ON  users.user_id = ride_suggestions.user_id " +
+                    "LEFT JOIN shared_rides ON shared_rides.ride_suggestion_id = ride_suggestions.ride_suggestion_id " +
+                    "WHERE chat_id<>?;");
+            preparedStatement.setInt(1, chatId);
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+
+            while (rs.next()) {
+                RideDetails rideDetails = convertResultSetToRideDetails(rs);
+                rideDetailsList.add(rideDetails);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } finally {
+            DbUtil.close(rs);
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return rideDetailsList;
+    }
+
     private RideDetails convertResultSetToRideDetails(ResultSet rs) throws SQLException{
         RideDetails rideDetails = new RideDetails();
         rideDetails.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
@@ -285,7 +375,15 @@ public class RideSuggestionDAO {
         ridesWithType.put(RideSuggestionType.UNDEFINED, getRideSuggestionsMadeByOthers(userId));
 
         return ridesWithType;
+    }
 
+    public Hashtable<RideSuggestionType, List<RideDetails>> getRidesByChatId(int chatId) {
+        Hashtable<RideSuggestionType, List<RideDetails>> ridesWithType = new Hashtable<>();
+        ridesWithType.put(RideSuggestionType.PASSENGER, getRideSuggestionsByChatIdWhereUserIsPassenger(chatId));
+        ridesWithType.put(RideSuggestionType.DRIVER, getRideSuggestionsByChatIdWhereUserIsDriver(chatId));
+        ridesWithType.put(RideSuggestionType.UNDEFINED, getRideSuggestionsByChatIdMadeByOthers(chatId));
+
+        return ridesWithType;
     }
 
     public boolean exist(int rideId, int userId) throws SQLException {
