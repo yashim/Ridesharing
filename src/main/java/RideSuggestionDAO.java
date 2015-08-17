@@ -268,8 +268,8 @@ public class RideSuggestionDAO {
                 RideDetails rideDetails = convertResultSetToRideDetails(rs);
                 rideDetailsList.add(rideDetails);
             }
-        } catch (SQLException e) {
-            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getCause() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -299,8 +299,8 @@ public class RideSuggestionDAO {
                 RideDetails rideDetails = convertResultSetToRideDetails(rs);
                 rideDetailsList.add(rideDetails);
             }
-        } catch (SQLException e) {
-            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getCause() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
@@ -328,8 +328,8 @@ public class RideSuggestionDAO {
                 RideDetails rideDetails = convertResultSetToRideDetails(rs);
                 rideDetailsList.add(rideDetails);
             }
-        } catch (SQLException e) {
-            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getCause() + ":" + e.getMessage());
         } finally {
             DbUtil.close(rs);
             DbUtil.close(preparedStatement);
