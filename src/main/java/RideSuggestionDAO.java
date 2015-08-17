@@ -257,12 +257,14 @@ public class RideSuggestionDAO {
         try {
             connection = ConnectionFactory.getConnection();
             //todo add check for ride time
-            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, start_point, destination_point, ride_time, time_lag, capacity, " +
-                    "  free_seats_number, ride_suggestions.ride_suggestion_id,ride_suggestions.user_id, shared_rides.user_id, chat_id " +
+            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, " +
+                    "start_point, destination_point, ride_time, time_lag, capacity,free_seats_number, " +
+                    "ride_suggestions.ride_suggestion_id, ride_suggestions.user_id, shared_rides.user_id, chat_id " +
                     "FROM ride_suggestions " +
-                    "  LEFT JOIN shared_rides ON ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
-                    "  JOIN users ON users.user_id = shared_rides.user_id " +
-                    "WHERE shared_rides.user_id IS NOT NULL AND chat_id=?");
+                    "JOIN users ON users.user_id = ride_suggestions.user_id " +
+                    "LEFT JOIN shared_rides ON ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
+                    "WHERE shared_rides.user_id IS NOT NULL AND shared_rides.user_id = (SELECT user_id FROM users " +
+                                                                                                "WHERE chat_id=?)");
             preparedStatement.setInt(1, chatId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -344,6 +346,21 @@ public class RideSuggestionDAO {
     }
 
     private RideDetails convertResultSetToRideDetails(ResultSet rs) throws SQLException{
+        RideDetails rideDetails = new RideDetails();
+        rideDetails.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
+        rideDetails.setUserId(rs.getInt("user_id"));
+        rideDetails.setStartPoint(rs.getString("start_point"));
+        rideDetails.setDestinationPoint(rs.getString("destination_point"));
+        rideDetails.setStartTimeMin(rs.getTimestamp("ride_time"));
+        rideDetails.setTimeLag(rs.getInt("time_lag"));
+        rideDetails.setCapacity(rs.getInt("capacity"));
+        rideDetails.setFreeSeatsNumber(rs.getInt("free_seats_number"));
+        rideDetails.setDriverName(rs.getString("first_name"));
+        rideDetails.setDriverLastName(rs.getString("last_name"));
+        rideDetails.setDriverPhone(rs.getString("phone"));
+        return rideDetails;
+    }
+    private RideDetails convertResultSetToRideDetailsForPassenger(ResultSet rs) throws SQLException{
         RideDetails rideDetails = new RideDetails();
         rideDetails.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
         rideDetails.setUserId(rs.getInt("user_id"));

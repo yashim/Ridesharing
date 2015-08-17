@@ -1,8 +1,14 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * Author: shim.
  * Creation date: 8/13/15.
  */
 public class TelegramBotResponses {
+    private final static Logger logger = LogManager.getLogger(TelegramBotResponses.class);
     public final static String KAZAN = "%D0%9A%D0%B0%D0%B7%D0%B0%D0%BD%D1%8C";
     public final static String INNOPOLIS = "%D0%98%D0%BD%D0%BD%D0%BE%D0%BF%D0%BE%D0%BB%D0%B8%D1%81";
     public final static String ABOUT = "I am your Innopolis RideSharing bot."
@@ -27,4 +33,40 @@ public class TelegramBotResponses {
     public final static String CREATE_WRONG_CITY = "Please specify the first word - Destination point of your journey - as Kazan or Innopolis, here is my modest examples: \"Kazan 14:50\" or \"Innopolis 20:40\", or \""+ KAZAN +" 19:00\", or \""+ INNOPOLIS +" 8:00\"";
     public final static String CREATE_WRONG_PARAMETERS = "In order to create a triumphant ride please specify a Destination point as the first word and Departure time as the second word. Here is my humble examples: \"Kazan 14:50\" or \"Innopolis 20:40\", or \""+ KAZAN +" 19:00\", or \""+ INNOPOLIS +" 8:00\"";
     public final static String DELETE_INFO = "Your Highness, please select the ride you want to cancel. To do this, please tap Show and then reply to the message with Cancel.";
+
+    private static final byte[] utf8BytesJoin = new byte[4];
+    private static final byte[] utf8BytesCancel = new byte[4];
+    private static final byte[] utf8BytesCreate = new byte[4];
+    private static final byte[] utf8BytesShow = new byte[4];
+    public static String createSymbol;
+    public static String joinSymbol;
+    public static String cancelSymbol;
+    public static String showSymbol;
+    static {
+        utf8BytesJoin[0] = (byte)0xF0;
+        utf8BytesJoin[1] = (byte)0x9F;
+        utf8BytesJoin[2] = (byte)0x8E;
+        utf8BytesJoin[3] = (byte)0x8E;
+        utf8BytesCancel[0] = (byte)0xF0;
+        utf8BytesCancel[1] = (byte)0x9F;
+        utf8BytesCancel[2] = (byte)0x92;
+        utf8BytesCancel[3] = (byte)0xA9;
+        utf8BytesCreate[0] = (byte)0xF0;
+        utf8BytesCreate[1] = (byte)0x9F;
+        utf8BytesCreate[2] = (byte)0x9A;
+        utf8BytesCreate[3] = (byte)0x80;
+        utf8BytesShow[0] = (byte)0xF0;
+        utf8BytesShow[1] = (byte)0x9F;
+        utf8BytesShow[2] = (byte)0x94;
+        utf8BytesShow[3] = (byte)0xAE;
+        try {
+            joinSymbol = new String(utf8BytesJoin, "UTF-8");
+            cancelSymbol = new String(utf8BytesCancel, "UTF-8");
+            showSymbol  = new String(utf8BytesShow, "UTF-8");
+            createSymbol = new String(utf8BytesCreate, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
 }

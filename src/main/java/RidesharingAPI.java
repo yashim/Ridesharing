@@ -261,6 +261,38 @@ public class RidesharingAPI {
 
         post("/ridesharingBot", (req, res) -> {
             try {
+//                byte[] utf8BytesJoin = new byte[4];
+//                utf8BytesJoin[0] = (byte)0xF0;
+//                utf8BytesJoin[1] = (byte)0x9F;
+//                utf8BytesJoin[2] = (byte)0x8E;
+//                utf8BytesJoin[3] = (byte)0x8E;
+//                String joinSymbol = "";
+//                byte[] utf8BytesCancel = new byte[4];
+//                utf8BytesCancel[0] = (byte)0xF0;
+//                utf8BytesCancel[1] = (byte)0x9F;
+//                utf8BytesCancel[2] = (byte)0x92;
+//                utf8BytesCancel[3] = (byte)0xA9;
+//                String cancelSymbol = "";
+//                byte[] utf8BytesCreate = new byte[4];
+//                utf8BytesCreate[0] = (byte)0xF0;
+//                utf8BytesCreate[1] = (byte)0x9F;
+//                utf8BytesCreate[2] = (byte)0x9A;
+//                utf8BytesCreate[3] = (byte)0x80;
+//                String createSymbol = "";
+//                byte[] utf8BytesShow = new byte[4];
+//                utf8BytesShow[0] = (byte)0xF0;
+//                utf8BytesShow[1] = (byte)0x9F;
+//                utf8BytesShow[2] = (byte)0x94;
+//                utf8BytesShow[3] = (byte)0xAE;
+//                String showSymbol = "";
+//                try {
+//                    joinSymbol = new String(utf8BytesJoin, "UTF-8");
+//                    cancelSymbol = new String(utf8BytesCancel, "UTF-8");
+//                    showSymbol  = new String(utf8BytesShow, "UTF-8");
+//                    createSymbol = new String(utf8BytesCreate, "UTF-8");
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
                 logger.info(req.body());
                 JsonElement jsonElement = new JsonParser().parse(req.body());
                 Message requestMessage = g.fromJson(jsonElement.getAsJsonObject().getAsJsonObject("message").toString(),
@@ -291,7 +323,8 @@ public class RidesharingAPI {
                     sendPost(requestMessage.getChat().getId(), TelegramBotResponses.ABOUT, getReplyMarkup());
                     return "OK";
                 }
-                if (text.startsWith("/show") || text.startsWith("show")) {
+                if (text.startsWith(TelegramBotResponses.showSymbol + " show") ||text.startsWith("/show") ||
+                        text.startsWith("show")) {
                     sendPost(chatId, "I am thinking... Please wait", getReplyMarkup());
                     Hashtable<RideSuggestionType, List<RideDetails>> rides = rideSuggestionDAO.getRidesByChatId(chatId);
                     List<RideDetails> upcomingRides = rides.get(RideSuggestionType.UNDEFINED);
@@ -333,7 +366,9 @@ public class RidesharingAPI {
                     }
                     return "OK";
                 }
-                if (text.startsWith("/create") || text.startsWith("create") || text.startsWith("new") || text.startsWith("Еду")) {
+                if (text.startsWith("/create") || text.startsWith("create") ||
+                        text.startsWith(TelegramBotResponses.createSymbol + " create") || text.startsWith("new") ||
+                        text.startsWith("Еду")) {
                     if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername().equals("")) {
                         sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
                         return "OK";
@@ -407,7 +442,8 @@ public class RidesharingAPI {
                     return "OK";
                 }
                 //todo notify passengers
-                if (text.startsWith("/cancel") || text.startsWith("cancel")){
+                if (text.startsWith(TelegramBotResponses.cancelSymbol + " cancel") || text.startsWith("/cancel") ||
+                        text.startsWith("cancel")){
                     if (requestMessage.getReplyToMessage() == null) {
                         sendPost(chatId, TelegramBotResponses.DELETE_INFO, getReplyMarkup());
                         return "OK";
@@ -440,7 +476,8 @@ public class RidesharingAPI {
                     return "OK";
 
                 }
-                if (text.startsWith("/join") || text.startsWith("join")) {
+                if (text.startsWith(TelegramBotResponses.joinSymbol+" join")|| text.startsWith("join") ||
+                        text.startsWith("/join")) {
                     if (requestMessage.getReplyToMessage() == null) {
                         sendPost(chatId, TelegramBotResponses.JOIN_INFO, getReplyMarkup());
                         return "OK";
@@ -664,10 +701,10 @@ public class RidesharingAPI {
     }
     String getReplyMarkup(){
         ReplyKeyboardMarkup.Builder builder = new ReplyKeyboardMarkup.Builder();
-        builder.row("Join", "Show");//create getrideslist delete join
-        builder.row("Create", "Cancel");//, "New Ride");//, "Join", "Unjoin", "Delete Ride");
+        builder.row("%F0%9F%8E%8E Join", "%F0%9F%94%AE Show");//create getrideslist delete join
+        builder.row("%F0%9F%9A%80 Create", "%F0%9F%92%A9 Cancel");//, "New Ride");//, "Join", "Unjoin", "Delete Ride");
         builder.setResizeKeyboard();
         return builder.build().serialize();
     }
-
+    //1F440	\xF0\x9F\x91x\80	3D D8 40 DC	D83D DC40
 }
