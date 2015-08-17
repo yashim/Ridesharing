@@ -353,10 +353,12 @@ public class RidesharingAPI {
                         return "OK";
                     }
                     RideSuggestion rideSuggestion = new RideSuggestion();
-                    if (params[0].toLowerCase().equals("kazan") || params[0].toLowerCase().equals("innopolis")
-                            || params[0].toLowerCase().equals("казань") || params[0].toLowerCase().equals("иннополис")) {
-                        rideSuggestion.setDestinationPoint(params[0].toLowerCase());
-                    } else {
+                    if (params[0].toLowerCase().equals("kazan") || params[0].toLowerCase().equals("казань")){
+                        rideSuggestion.setDestinationPoint("kazan");
+                    }else if( params[0].toLowerCase().equals("innopolis") || params[0].toLowerCase().equals("иннополис")){
+                        rideSuggestion.setDestinationPoint("innopolis");
+                    }
+                    else {
                         sendPost(chatId, TelegramBotResponses.CREATE_WRONG_CITY, getReplyMarkup());
                         return "OK";
                     }
@@ -452,7 +454,11 @@ public class RidesharingAPI {
                     //todo seats amount
                     User user = userDAO.getUserByChatId(chatId);
                     RideSuggestion rideSuggestion = rideSuggestionDAO.getRideSuggestion(rideId);
-                    if (rideSuggestion == null || rideSuggestion.getUserId() == user.getId()) {
+                    if (rideSuggestion == null ) {
+                        sendPost(requestMessage.getChat().getId(), "I am sorry, this magic ride does not exist", getReplyMarkup());
+                        return "OK";
+                    }
+                    if (rideSuggestion.getUserId() == user.getId()) {
                         sendPost(requestMessage.getChat().getId(), "I am sorry, you cannot join your own ride", getReplyMarkup());
                         return "OK";
                     }
