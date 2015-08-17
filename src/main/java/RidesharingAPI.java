@@ -454,7 +454,7 @@ public class RidesharingAPI {
                     //todo seats amount
                     User user = userDAO.getUserByChatId(chatId);
                     RideSuggestion rideSuggestion = rideSuggestionDAO.getRideSuggestion(rideId);
-                    if (rideSuggestion.getUserId() == user.getId()) {
+                    if (rideSuggestion == null || rideSuggestion.getUserId() == user.getId()) {
                         sendPost(requestMessage.getChat().getId(), "I am sorry, you cannot join your own ride", getReplyMarkup());
                         return "OK";
                     }

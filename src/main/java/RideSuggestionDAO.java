@@ -88,7 +88,8 @@ public class RideSuggestionDAO {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions WHERE ride_suggestion_id=?");
             preparedStatement.setInt(1, id);
-            preparedStatement.execute();
+            if(!preparedStatement.execute())
+                return null;
             rs = preparedStatement.getResultSet();
             rideSuggestion = new RideSuggestion();
             while (rs.next()) {
