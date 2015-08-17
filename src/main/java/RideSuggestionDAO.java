@@ -88,7 +88,7 @@ public class RideSuggestionDAO {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("SELECT * FROM ride_suggestions WHERE ride_suggestion_id=?");
             preparedStatement.setInt(1, id);
-
+            preparedStatement.execute();
             rs = preparedStatement.getResultSet();
             if(rs == null || !rs.isBeforeFirst())
                 return null;
@@ -198,7 +198,7 @@ public class RideSuggestionDAO {
                     "LEFT JOIN users ON  users.user_id = ride_suggestions.user_id " +
                     "LEFT JOIN shared_rides ON shared_rides.ride_suggestion_id = ride_suggestions.ride_suggestion_id " +
                     "WHERE (shared_rides.user_id IS NULL OR shared_rides.user_id  <> ?) AND (ride_suggestions.user_id " +
-                    "IS NULL OR ride_suggestions.user_id <> ?) AND ride_time > NOW() AND free_seats_number > 0;");
+                    "IS NULL OR ride_suggestions.user_id <> ?) AND ride_time > NOW() AND free_seats_number > 0");
             preparedStatement.setInt(1, userId);
             preparedStatement.setInt(2, userId);
             preparedStatement.execute();
@@ -257,11 +257,12 @@ public class RideSuggestionDAO {
         try {
             connection = ConnectionFactory.getConnection();
             //todo add check for ride time
-            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, ride_suggestions.ride_suggestion_id,ride_suggestions.user_id, shared_rides.user_id, chat_id "+
+            preparedStatement = connection.prepareCall("SELECT users.last_name, users.first_name, users.phone, start_point, destination_point, ride_time, time_lag, capacity, " +
+                    "  free_seats_number, ride_suggestions.ride_suggestion_id,ride_suggestions.user_id, shared_rides.user_id, chat_id " +
                     "FROM ride_suggestions " +
-                    "LEFT JOIN shared_rides ON ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
-                    "JOIN users ON users.user_id = ride_suggestions.user_id " +
-                    "WHERE shared_rides.user_id IS NOT NULL AND chat_id<>?");
+                    "  LEFT JOIN shared_rides ON ride_suggestions.ride_suggestion_id = shared_rides.ride_suggestion_id " +
+                    "  JOIN users ON users.user_id = shared_rides.user_id " +
+                    "WHERE shared_rides.user_id IS NOT NULL AND chat_id=?");
             preparedStatement.setInt(1, chatId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
@@ -317,12 +318,14 @@ public class RideSuggestionDAO {
         List<RideDetails> rideDetailsList = new ArrayList<>();
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("SELECT DISTINCT users.user_id, users.last_name, users.first_name, users.phone, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, ride_suggestions.ride_suggestion_id "+
-                    "FROM ride_suggestions " +
-                    "LEFT JOIN users ON  users.user_id = ride_suggestions.user_id " +
-                    "LEFT JOIN shared_rides ON shared_rides.ride_suggestion_id = ride_suggestions.ride_suggestion_id " +
-                    "WHERE chat_id<>?;");
+            preparedStatement = connection.prepareCall("SELECT DISTINCT users.user_id, users.last_name, users.first_name, " +
+                    "users.phone, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, " +
+                    "ride_suggestions.ride_suggestion_id, shared_rides.user_id FROM ride_suggestions LEFT JOIN users ON  " +
+                    "users.user_id = ride_suggestions.user_id LEFT JOIN shared_rides ON shared_rides.ride_suggestion_id " +
+                    "= ride_suggestions.ride_suggestion_id WHERE chat_id<>? AND (shared_rides.user_id NOT IN " +
+                    "(SELECT users.user_id FROM users WHERE chat_id=?)OR shared_rides.user_id IS NULL)");
             preparedStatement.setInt(1, chatId);
+            preparedStatement.setInt(2, chatId);
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
 
