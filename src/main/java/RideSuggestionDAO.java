@@ -21,6 +21,9 @@ public class RideSuggestionDAO {
         createRideResult.put("Status", "-1");
         try {
             connection = ConnectionFactory.getConnection();
+            if(!exist(rideSuggestion.getRideSuggestionId(), rideSuggestion.getUserId(), rideSuggestion.getRideTime())){
+                return createRideResult;
+            }
             String sqlInsertReview = "INSERT INTO ride_suggestions (user_id, start_point,destination_point, " +
                     "ride_time, time_lag, capacity, free_seats_number) " +
                     "VALUES (?, ? ,? ,?, ?, ?, ?)";
@@ -277,6 +280,17 @@ public class RideSuggestionDAO {
         preparedStatement = connection.prepareCall("SELECT 1 FROM ride_suggestions WHERE ride_suggestion_id =? AND user_id = ?");
         preparedStatement.setInt(1, rideId);
         preparedStatement.setInt(2, userId);
+        preparedStatement.execute();
+        result = preparedStatement.getResultSet();
+        return result.next();
+    }
+    public boolean exist(int rideId, int userId, Timestamp rideTime) throws SQLException {
+        ResultSet result = null;
+        connection = ConnectionFactory.getConnection();
+        preparedStatement = connection.prepareCall("SELECT 1 FROM ride_suggestions WHERE ride_suggestion_id =? AND user_id = ? AND ride_time = ?");
+        preparedStatement.setInt(1, rideId);
+        preparedStatement.setInt(2, userId);
+        preparedStatement.setTimestamp(3, rideTime);
         preparedStatement.execute();
         result = preparedStatement.getResultSet();
         return result.next();

@@ -27,7 +27,7 @@ public class RidesharingAPI {
     public RidesharingAPI(final UserDAO userDAO, final RideSuggestionDAO rideSuggestionDAO,
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO, final DeviceDAO deviceDAO) {
 //        Spark.setSecure();
-        //Spark.setPort(8443);
+        Spark.setPort(8443);
         Spark.options("/*", (request, response) -> {
 
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -292,8 +292,13 @@ public class RidesharingAPI {
             }
             if(text.startsWith("/show") || text.startsWith("show")) {
                 //todo change user id to login
+                User user = userDAO.getUserByChatId(requestMessage.getFrom().getId());
+                if(user == null){
+                    logger.error("user ==null");
+                    return "OK";
+                }
                 Hashtable<RideSuggestionType, List<RideDetails>> rides = rideSuggestionDAO.getRides(
-                        userDAO.getUserByChatId(requestMessage.getFrom().getId()).getId());
+                        user.getId());
                 List<RideDetails> upcomingRides = rides.get(RideSuggestionType.UNDEFINED);
                 String responseMessage = "";
                 if (upcomingRides.size() == 0) {
@@ -391,8 +396,15 @@ public class RidesharingAPI {
                 rideSuggestion.setCapacity(3);
                 rideSuggestion.setFreeSeatsNumber(3);
 //                }
+                User user = userDAO.getUserByChatId(chatId);
+                if(user.getId()==0)
+                    return "OK";
                 rideSuggestion.setUserId(userDAO.getUserByChatId(chatId).getId());
                 String rideId = rideSuggestionDAO.createRideSuggestion(rideSuggestion).get("RideId");
+                if(rideId == null){
+                    logger.error("rideId == null");
+                    return "OK";
+                }
                 rideSuggestion.setRideSuggestionId(Integer.parseInt(rideId));
                 sendPost(requestMessage.getChat().getId(), "You successfully created the ride!"+System.lineSeparator() +
                         formatRideSuggestion(rideSuggestion), getReplyMarkup());
@@ -405,6 +417,10 @@ public class RidesharingAPI {
                     return "OK";
                 }
                 String replyMessage = requestMessage.getReplyToMessage().getText();
+                if(!replyMessage.startsWith("ID")){
+                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.DELETE_INFO, getReplyMarkup());
+                    return "OK";
+                }
                 int rideId = Integer.parseInt(replyMessage.substring(4, replyMessage.indexOf(System.lineSeparator())));
                 int userId = userDAO.getUserByChatId(chatId).getId();
                 try {
@@ -421,7 +437,7 @@ public class RidesharingAPI {
                     }
                     sendPost(requestMessage.getChat().getId(), "You successfully canceled the ride with ID: "+rideId+"!", getReplyMarkup());
                 } catch (SQLException e) {
-                    //todo log exception
+                    logger.error(e.getMessage());
                     return "OK";
                 }
                 return "OK";
