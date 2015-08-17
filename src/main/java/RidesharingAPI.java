@@ -375,7 +375,8 @@ public class RidesharingAPI {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(new Date());
                 //todo exclude magic number 1, edit timezone
-                cal.set(Calendar.HOUR_OF_DAY, hours-1);
+//                cal.set(Calendar.HOUR_OF_DAY, hours-1);
+                cal.set(Calendar.HOUR_OF_DAY, hours);
                 cal.set(Calendar.MINUTE, minutes);
                 if(cal.getTime().before(new Date()))
                     cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -464,6 +465,11 @@ public class RidesharingAPI {
                 int rideId = Integer.parseInt(replyMessage.substring(4, replyMessage.indexOf(System.lineSeparator())));
                 //todo seats amount
                 User user = userDAO.getUserByChatId(chatId);
+                RideSuggestion rideSuggestion = rideSuggestionDAO.getRideSuggestion(rideId);
+                if(rideSuggestion.getUserId()==user.getId()) {
+                    sendPost(requestMessage.getChat().getId(), "I am sorry, you cannot join your own ride", getReplyMarkup());
+                    return "OK";
+                }
                 sharedRideDAO.joinRide(rideId, user.getId(), 1);
                 //todo
                 RideDetails rideDetails = rideSuggestionDAO.getRide(rideId);
