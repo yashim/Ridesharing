@@ -20,9 +20,9 @@ public class TelegramBotResponses {
     public final static String JOIN_INFO = "Please, kindly select the ride you wish to join by tapping Show. Then reply to the message with the ride you want to join by tapping Join. With your presence the ride will be superb.";
     public final static String JOIN_PROVIDE_USERNAME = "In order to give a touch of divinity to the ride, please provide your notable username to Telegram: Settings -> Username. https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one.";
     public final static String CREATE_PROVIDE_USERNAME = "In order to create a magnificent ride, please provide your notable username to Telegram: Settings -> Username. https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one number.";
-    public final static String CREATE_SPECIFY_PARAMETERS = "In order to create a triumphant ride please specify a Destination point as the first parameter and Departure time as the second parameter. Here is my humble example: Create Kazan 14:50";
-    public final static String CREATE_WRONG_TIMEFORMAT = "Please specify the second parameter - starting time of your journey - as hh:mm, here is my modest example: 14:30";
-    public final static String CREATE_WRONG_CITY = "Please specify the first parameter - Destination point of your journey - as Kazan or Innopolis, here is my modest example: Create Innopolis 14:30";
-    public final static String CREATE_WRONG_PARAMETERS = "In order to create a triumphant ride please specify a Destination point as the first parameter and Departure time as the second parameter. Here is my humble example: Create Kazan 14:50";
+    public final static String CREATE_SPECIFY_PARAMETERS = "In order to create a triumphant ride please specify a Destination point as the word and Departure time as the word. Here is my humble examples: Kazan 14:50 or Innopolis 20:40, or Казань 19:00, or Иннополис 8:00";
+    public final static String CREATE_WRONG_TIMEFORMAT = "Please specify the second word - starting time of your journey - as hh:mm, here is my modest example: 14:30";
+    public final static String CREATE_WRONG_CITY = "Please specify the word - Destination point of your journey - as Kazan or Innopolis, here is my modest examples: Kazan 14:50 or Innopolis 20:40, or Казань 19:00";
+    public final static String CREATE_WRONG_PARAMETERS = "In order to create a triumphant ride please specify a Destination point as the word and Departure time as the word. Here is my humble examples: Kazan 14:50 or Innopolis 20:40, or Казань 19:00, , or Иннополис 8:00";
     public final static String DELETE_INFO = "Your Highness, please select the ride you want to cancel. To do this, please tap Show and then reply to the message with Cancel.";
 }

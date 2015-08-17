@@ -348,7 +348,8 @@ public class RidesharingAPI {
                         return "OK";
                     }
                     RideSuggestion rideSuggestion = new RideSuggestion();
-                    if (params[1].toLowerCase().equals("kazan") || params[1].toLowerCase().equals("innopolis")) {
+                    if (params[1].toLowerCase().equals("kazan") || params[1].toLowerCase().equals("innopolis")
+                            || params[1].toLowerCase().equals("казань") || params[1].toLowerCase().equals("иннополис")) {
                         rideSuggestion.setDestinationPoint(params[1].toLowerCase());
                     } else {
                         sendPost(chatId, TelegramBotResponses.CREATE_WRONG_CITY, getReplyMarkup());
@@ -377,9 +378,9 @@ public class RidesharingAPI {
 
                     rideSuggestion.setRideTime(new Timestamp(cal.getTime().getTime()));
 
-                    if (rideSuggestion.getDestinationPoint().equals("kazan")) {
+                    if (rideSuggestion.getDestinationPoint().equals("kazan") || rideSuggestion.getDestinationPoint().equals("казань")) {
                         rideSuggestion.setStartPoint("innopolis");
-                    } else if (rideSuggestion.getDestinationPoint().equals("innopolis")) {
+                    } else if (rideSuggestion.getDestinationPoint().equals("innopolis") || rideSuggestion.getDestinationPoint().equals("иннополис")) {
                         rideSuggestion.setStartPoint("kazan");
                     }
 //
@@ -407,7 +408,7 @@ public class RidesharingAPI {
                     return "OK";
                 }
                 //todo notify passengers
-                if (text.startsWith("/cancel") || text.startsWith("cancel")) {
+                if (text.startsWith("innopolis") || text.startsWith("kazan") || text.startsWith("иннополис") || text.startsWith("казань")) {
                     if (requestMessage.getReplyToMessage() == null) {
                         sendPost(chatId, TelegramBotResponses.DELETE_INFO, getReplyMarkup());
                         return "OK";

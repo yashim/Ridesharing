@@ -90,7 +90,7 @@ public class RideSuggestionDAO {
             preparedStatement.setInt(1, id);
 
             rs = preparedStatement.getResultSet();
-            if(!rs.isBeforeFirst())
+            if(rs == null || !rs.isBeforeFirst())
                 return null;
             //rideSuggestion = new RideSuggestion();
             while (rs.next()) {
