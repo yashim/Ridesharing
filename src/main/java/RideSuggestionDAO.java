@@ -172,7 +172,7 @@ public class RideSuggestionDAO {
             rs = preparedStatement.getResultSet();
 
             while (rs.next()) {
-                RideDetails rideDetails = convertResultSetToRideSuggestion(rs);
+                RideDetails rideDetails = convertResultSetToRideDetails(rs);
                 rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
@@ -203,7 +203,7 @@ public class RideSuggestionDAO {
             rs = preparedStatement.getResultSet();
 
             while (rs.next()) {
-                RideDetails rideDetails = convertResultSetToRideSuggestion(rs);
+                RideDetails rideDetails = convertResultSetToRideDetails(rs);
                 rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
@@ -235,7 +235,7 @@ public class RideSuggestionDAO {
             rs = preparedStatement.getResultSet();
 
             while (rs.next()) {
-                RideDetails rideDetails = convertResultSetToRideSuggestion(rs);
+                RideDetails rideDetails = convertResultSetToRideDetails(rs);
                 rideDetailsList.add(rideDetails);
             }
         } catch (SQLException e) {
@@ -248,7 +248,7 @@ public class RideSuggestionDAO {
         return rideDetailsList;
     }
 
-    private RideDetails convertResultSetToRideSuggestion(ResultSet rs) throws SQLException{
+    private RideDetails convertResultSetToRideDetails(ResultSet rs) throws SQLException{
         RideDetails rideDetails = new RideDetails();
         rideDetails.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
         rideDetails.setUserId(rs.getInt("user_id"));
@@ -263,6 +263,20 @@ public class RideSuggestionDAO {
         rideDetails.setDriverPhone(rs.getString("phone"));
         return rideDetails;
     }
+
+    private RideSuggestion convertResultSetToRideSuggestion(ResultSet rs) throws SQLException{
+        RideDetails rideDetails = new RideDetails();
+        rideDetails.setRideSuggestionId(rs.getInt("ride_suggestion_id"));
+        rideDetails.setUserId(rs.getInt("user_id"));
+        rideDetails.setStartPoint(rs.getString("start_point"));
+        rideDetails.setDestinationPoint(rs.getString("destination_point"));
+        rideDetails.setStartTimeMin(rs.getTimestamp("ride_time"));
+        rideDetails.setTimeLag(rs.getInt("time_lag"));
+        rideDetails.setCapacity(rs.getInt("capacity"));
+        rideDetails.setFreeSeatsNumber(rs.getInt("free_seats_number"));
+        return rideDetails;
+    }
+
 
     public Hashtable<RideSuggestionType, List<RideDetails>> getRides(int userId) {
         Hashtable<RideSuggestionType, List<RideDetails>> ridesWithType = new Hashtable<>();
