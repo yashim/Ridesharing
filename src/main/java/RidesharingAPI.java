@@ -334,23 +334,28 @@ public class RidesharingAPI {
                     return "OK";
                 }
                 if (text.startsWith("/create") || text.startsWith("create") || text.startsWith("new") || text.startsWith("Еду")) {
-                    if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername() == "") {
+                    if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername().equals("")) {
+                        sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
+                        return "OK";
+                    }
+                    sendPost(chatId, TelegramBotResponses.CREATE_SPECIFY_PARAMETERS, getReplyMarkup());
+                    return "OK";
+                }
+                if (text.startsWith("kazan") || text.startsWith("казань") || text.startsWith("innopolis") || text.startsWith("иннополис")) {
+
+                    if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername().equals("")) {
                         sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
                         return "OK";
                     }
                     String[] params = text.split(" ");
-                    if (params.length > 3) {
-                        sendPost(chatId, TelegramBotResponses.CREATE_WRONG_PARAMETERS, getReplyMarkup());
-                        return "OK";
-                    }
-                    if (params.length < 2) {
+                    if (params.length > 2 || params.length < 1) {
                         sendPost(chatId, TelegramBotResponses.CREATE_SPECIFY_PARAMETERS, getReplyMarkup());
                         return "OK";
                     }
                     RideSuggestion rideSuggestion = new RideSuggestion();
-                    if (params[1].toLowerCase().equals("kazan") || params[1].toLowerCase().equals("innopolis")
-                            || params[1].toLowerCase().equals("казань") || params[1].toLowerCase().equals("иннополис")) {
-                        rideSuggestion.setDestinationPoint(params[1].toLowerCase());
+                    if (params[0].toLowerCase().equals("kazan") || params[0].toLowerCase().equals("innopolis")
+                            || params[0].toLowerCase().equals("казань") || params[0].toLowerCase().equals("иннополис")) {
+                        rideSuggestion.setDestinationPoint(params[0].toLowerCase());
                     } else {
                         sendPost(chatId, TelegramBotResponses.CREATE_WRONG_CITY, getReplyMarkup());
                         return "OK";
@@ -358,7 +363,7 @@ public class RidesharingAPI {
                     int hours = 0;
                     int minutes = 0;
                     try {
-                        String[] timeArr = params[2].split(":");
+                        String[] timeArr = params[1].split(":");
                         hours = Integer.parseInt(timeArr[0]);
                         minutes = Integer.parseInt(timeArr[1]);
                         if (hours < 0 || hours > 24 || minutes < 0 || minutes > 60)
@@ -383,16 +388,8 @@ public class RidesharingAPI {
                     } else if (rideSuggestion.getDestinationPoint().equals("innopolis") || rideSuggestion.getDestinationPoint().equals("иннополис")) {
                         rideSuggestion.setStartPoint("kazan");
                     }
-//
-//count seats
-//                if(params.length > 3){
-//                    int freeSearsAmount = Integer.parseInt(params[3]);
-//                    rideSuggestion.setCapacity(freeSearsAmount);
-//                    rideSuggestion.setFreeSeatsNumber(freeSearsAmount);
-//                }else {
                     rideSuggestion.setCapacity(3);
                     rideSuggestion.setFreeSeatsNumber(3);
-//                }
                     User user = userDAO.getUserByChatId(chatId);
                     if (user.getId() == 0)
                         return "OK";
@@ -408,7 +405,7 @@ public class RidesharingAPI {
                     return "OK";
                 }
                 //todo notify passengers
-                if (text.startsWith("innopolis") || text.startsWith("kazan") || text.startsWith("иннополис") || text.startsWith("казань")) {
+                if (text.startsWith("/cancel") || text.startsWith("cancel")){
                     if (requestMessage.getReplyToMessage() == null) {
                         sendPost(chatId, TelegramBotResponses.DELETE_INFO, getReplyMarkup());
                         return "OK";
