@@ -676,18 +676,18 @@ public class RidesharingAPI {
     String formatGetRidesResponse(RideDetails rideDetails){
         String responseMessage = "";
         responseMessage += "ID: " + rideDetails.getRideSuggestionId() + System.lineSeparator();
-        responseMessage += "Driver: " + rideDetails.getDriverName() +" "+ rideDetails.getDriverLastName() + System.lineSeparator();
         responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
-        //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideDetails.getRideTime()) + System.lineSeparator();
+        responseMessage += "Driver: " + rideDetails.getDriverName() +" "+ rideDetails.getDriverLastName() + System.lineSeparator();
+        //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         return responseMessage;
     }
     String formatGetRidesResponseWithRoute(RideDetails rideDetails){
         String responseMessage = "";
         responseMessage += "ID: " + rideDetails.getRideSuggestionId() + System.lineSeparator();
+        responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
         responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideDetails.getRideTime()) + System.lineSeparator();
         responseMessage += "Driver: " + rideDetails.getDriverName() +" "+ rideDetails.getDriverLastName() + System.lineSeparator();
-        responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
         //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         return responseMessage;
     }
