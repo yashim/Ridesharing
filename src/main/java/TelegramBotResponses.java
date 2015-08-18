@@ -49,8 +49,8 @@ public class TelegramBotResponses {
         utf8BytesJoin[3] = (byte)0x8E;
         utf8BytesCancel[0] = (byte)0xF0;
         utf8BytesCancel[1] = (byte)0x9F;
-        utf8BytesCancel[2] = (byte)0x92;
-        utf8BytesCancel[3] = (byte)0xA9;
+        utf8BytesCancel[2] = (byte)0x99;
+        utf8BytesCancel[3] = (byte)0x8A;
         utf8BytesCreate[0] = (byte)0xF0;
         utf8BytesCreate[1] = (byte)0x9F;
         utf8BytesCreate[2] = (byte)0x9A;
@@ -68,5 +68,8 @@ public class TelegramBotResponses {
             logger.error(e.getMessage());
         }
     }
-
+    public final static String KEYBORD_CREATE_ICON = "%F0%9F%9A%80 Create";
+    public final static String KEYBORD_SHOW_ICON = "%F0%9F%94%AE Show";
+    public final static String KEYBORD_JOIN_ICON = "%F0%9F%8E%8E Join";
+    public final static String KEYBORD_CANCEL_ICON = "%F0%9F%99%8A Cancel";
 }

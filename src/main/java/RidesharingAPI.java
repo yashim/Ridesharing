@@ -701,10 +701,9 @@ public class RidesharingAPI {
     }
     String getReplyMarkup(){
         ReplyKeyboardMarkup.Builder builder = new ReplyKeyboardMarkup.Builder();
-        builder.row("%F0%9F%8E%8E Join", "%F0%9F%94%AE Show");//create getrideslist delete join
-        builder.row("%F0%9F%9A%80 Create", "%F0%9F%92%A9 Cancel");//, "New Ride");//, "Join", "Unjoin", "Delete Ride");
+        builder.row(TelegramBotResponses.KEYBORD_JOIN_ICON, TelegramBotResponses.KEYBORD_SHOW_ICON);//create getrideslist delete join
+        builder.row(TelegramBotResponses.KEYBORD_CREATE_ICON, TelegramBotResponses.KEYBORD_CANCEL_ICON);//, "New Ride");//, "Join", "Unjoin", "Delete Ride");
         builder.setResizeKeyboard();
         return builder.build().serialize();
     }
-    //1F440	\xF0\x9F\x91x\80	3D D8 40 DC	D83D DC40
 }
