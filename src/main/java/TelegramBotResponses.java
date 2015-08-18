@@ -72,4 +72,16 @@ public class TelegramBotResponses {
     public final static String KEYBORD_SHOW_ICON = "%F0%9F%94%AE Show";
     public final static String KEYBORD_JOIN_ICON = "%F0%9F%8E%8E Join";
     public final static String KEYBORD_CANCEL_ICON = "%F0%9F%99%8A Cancel";
+
+    public final static String AVAILABLE_RIDES_HEADER = "%F0%9F%9A%97 AVAILABLE RIDES %F0%9F%9A%97";
+    public final static String DRIVER_RIDES_HEADER = "%F0%9F%9A%98 YOU ARE A DRIVER %F0%9F%9A%98";
+    public final static String PASSENGER_RIDES_HEADER = "%F0%9F%92%BA YOU ARE A PASSENGER %F0%9F%92%BA";
+
+
+    public final static String NO_AVAILABLE_RIDES_HEADER = "%F0%9F%9A%97 NO AVAILABLE RIDES %F0%9F%9A%97";
+    public final static String NO_DRIVER_RIDES_HEADER = "%F0%9F%9A%98 NO RIDES WHERE YOU ARE A DRIVER %F0%9F%9A%98";
+    public final static String NO_PASSENGER_RIDES_HEADER = "%F0%9F%92%BA NO RIDES WHERE YOU ARE A PASSENGER %F0%9F%92%BA";
+
+    //%F0%9F%9A%97 redcar
+    //%F0%9F%92%BA
 }
