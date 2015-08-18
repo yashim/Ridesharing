@@ -499,7 +499,7 @@ public class RidesharingAPI {
                         sendPost(chatId, TelegramBotResponses.JOIN_INFO, getReplyMarkup());
                         return "OK";
                     }
-                    if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername() == "") {
+                    if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername().equals("")) {
                         sendPost(requestMessage.getChat().getId(), TelegramBotResponses.JOIN_PROVIDE_USERNAME, getReplyMarkup());
                         return "OK";
                     }
