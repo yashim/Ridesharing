@@ -302,15 +302,17 @@ public class RidesharingAPI {
                 String text = requestMessage.getText().toLowerCase();
                 int chatId = requestMessage.getChat().getId();
                 String login = "";
-                if (requestMessage.getFrom().getUsername() != null || requestMessage.getFrom().getUsername() != "")
+                if (requestMessage.getFrom().getUsername() != null || !requestMessage.getFrom().getUsername().equals(""))
                     login = requestMessage.getFrom().getUsername();
 
                 //String[] params = text.split(" ");
                 if (text.startsWith("/start") || text.startsWith("/help")) {
                     try {
                         if (!userDAO.exist(chatId)) {
-                            userDAO.createUserFromTelegram(new User(login, "", requestMessage.getFrom().getFirstName(),
-                                    requestMessage.getFrom().getLastName(), ""), chatId);
+                            String firstName = requestMessage.getFrom().getFirstName()==null?"":requestMessage.getFrom().getFirstName();
+                            String lastName = requestMessage.getFrom().getLastName()==null?"":requestMessage.getFrom().getLastName();
+                            userDAO.createUserFromTelegram(new User(login, "", firstName,
+                                    lastName, ""), chatId);
                         }
                     } catch (SQLException e) {
                         sendPost(requestMessage.getChat().getId(), TelegramBotResponses.ERROR, getReplyMarkup());
@@ -382,6 +384,21 @@ public class RidesharingAPI {
                         sendPost(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
                         return "OK";
                     }
+                    User user = userDAO.getUserByChatId(chatId);
+                    if(user.getLogin()==null ||user.getLogin().equals("")||
+                            user.getLastName()==null ||user.getLastName().equals("") ||
+                            user.getFirstName()==null ||user.getFirstName().equals("")){
+                        String username = requestMessage.getFrom().getFirstName()==null?"":requestMessage.getFrom().getUsername();
+                        String firstName = requestMessage.getFrom().getFirstName()==null?"":requestMessage.getFrom().getFirstName();
+                        String lastName = requestMessage.getFrom().getLastName()==null?"":requestMessage.getFrom().getLastName();
+                        user.setLogin(username);
+                        user.setLastName(lastName);
+                        user.setFirstName(firstName);
+                        if(userDAO.update(chatId, username, firstName,lastName).get("Status").equals("-1")){
+                            sendPost(chatId, TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
+                            return "OK";
+                        }
+                    }
                     String[] params = text.split(" ");
                     if (params.length > 2 || params.length < 1) {
                         sendPost(chatId, TelegramBotResponses.CREATE_SPECIFY_PARAMETERS, getReplyMarkup());
@@ -427,7 +444,7 @@ public class RidesharingAPI {
                     }
                     rideSuggestion.setCapacity(3);
                     rideSuggestion.setFreeSeatsNumber(3);
-                    User user = userDAO.getUserByChatId(chatId);
+//                    user = userDAO.getUserByChatId(chatId);
                     if (user.getId() == 0)
                         return "OK";
                     rideSuggestion.setUserId(user.getId());
@@ -490,6 +507,20 @@ public class RidesharingAPI {
                     int rideId = Integer.parseInt(replyMessage.substring(4, replyMessage.indexOf(System.lineSeparator())));
                     //todo seats amount
                     User user = userDAO.getUserByChatId(chatId);
+                    if(user.getLogin()==null ||user.getLogin().equals("")||
+                            user.getLastName()==null ||user.getLastName().equals("") ||
+                            user.getFirstName()==null ||user.getFirstName().equals("")){
+                        String username = requestMessage.getFrom().getFirstName()==null?"":requestMessage.getFrom().getUsername();
+                        String firstName = requestMessage.getFrom().getFirstName()==null?"":requestMessage.getFrom().getFirstName();
+                        String lastName = requestMessage.getFrom().getLastName()==null?"":requestMessage.getFrom().getLastName();
+                        user.setLogin(username);
+                        user.setLastName(lastName);
+                        user.setFirstName(firstName);
+                        if(userDAO.update(chatId, username, firstName,lastName).get("Status").equals("-1")){
+                            sendPost(chatId, TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
+                            return "OK";
+                        }
+                    }
                     RideSuggestion rideSuggestion = rideSuggestionDAO.getRideSuggestion(rideId);
                     if (rideSuggestion == null ) {
                         sendPost(requestMessage.getChat().getId(), "%F0%9F%90%B5 I am sorry, this magic ride does not exist", getReplyMarkup());

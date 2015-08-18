@@ -81,6 +81,27 @@ public class UserDAO {
         return createUserResult;
     }
 
+    public Hashtable<String, Object> update (int chatId, String username, String firstName, String lastName)  {
+        Hashtable<String, Object> saveUserResult = new Hashtable<>();
+        saveUserResult.put("Status","-1");
+        connection = ConnectionFactory.getConnection();
+        try {
+            preparedStatement = connection.prepareStatement(
+                    "UPDATE users SET login = ?, first_name = ?, last_name = ? WHERE chat_id = ?");
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, firstName);
+            preparedStatement.setString(3, lastName);
+            preparedStatement.setInt(4, chatId);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if(affectedRows > 0)
+                saveUserResult.replace("Status", "0");
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() + ":" + e.getMessage());
+        }
+        return saveUserResult;
+    }
+
     public boolean exist(int chatId) throws SQLException {
         ResultSet result = null;
             connection = ConnectionFactory.getConnection();
