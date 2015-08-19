@@ -285,8 +285,6 @@ public class RidesharingAPI {
                     sendPost(requestMessage.getChat().getId(), TelegramBotResponses.ERROR, getReplyMarkup());
                     return "OK";
                 }
-
-                //String[] params = text.split(" ");
                 if (text.startsWith("/start") || text.startsWith("/help")) {
 
                     sendPost(requestMessage.getChat().getId(), TelegramBotResponses.START, getReplyMarkup());

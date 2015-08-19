@@ -322,7 +322,7 @@ public class RideSuggestionDAO {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("SELECT DISTINCT users.user_id, users.last_name, users.first_name, " +
                     "users.phone, start_point, destination_point, ride_time, time_lag, capacity, free_seats_number, " +
-                    "ride_suggestions.ride_suggestion_id, shared_rides.user_id FROM ride_suggestions LEFT JOIN users ON  " +
+                    "ride_suggestions.ride_suggestion_id FROM ride_suggestions LEFT JOIN users ON  " +
                     "users.user_id = ride_suggestions.user_id LEFT JOIN shared_rides ON shared_rides.ride_suggestion_id " +
                     "= ride_suggestions.ride_suggestion_id WHERE chat_id<>? AND ride_time > NOW() AND (shared_rides.user_id NOT IN " +
                     "(SELECT users.user_id FROM users WHERE chat_id=?) OR shared_rides.user_id IS NULL) ORDER BY ride_time");
