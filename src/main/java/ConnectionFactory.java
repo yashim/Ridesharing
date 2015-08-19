@@ -13,7 +13,7 @@ public class ConnectionFactory {
 
     private final Logger logger = LogManager.getLogger(ConnectionFactory.class);
 
-    public static final String MYSQL_LOCAL_DB_URL = "jdbc:mysql://localhost:3306/ridesharing";
+    public static final String MYSQL_LOCAL_DB_URL = "jdbc:mysql://localhost:3306/ridesharing?characterEncoding=UTF-8";
     public static final String MYSQL_LOCAL_DB_USER = "shim";
     public static final String MYSQL_LOCAL_DB_USER_PASSWORD = "shim";
     public static final String MYSQL_LIBRARY_CLASS_NAME = "com.mysql.jdbc.Driver";
