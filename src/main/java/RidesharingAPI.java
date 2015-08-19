@@ -261,38 +261,6 @@ public class RidesharingAPI {
 
         post("/ridesharingBot", (req, res) -> {
             try {
-//                byte[] utf8BytesJoin = new byte[4];
-//                utf8BytesJoin[0] = (byte)0xF0;
-//                utf8BytesJoin[1] = (byte)0x9F;
-//                utf8BytesJoin[2] = (byte)0x8E;
-//                utf8BytesJoin[3] = (byte)0x8E;
-//                String joinSymbol = "";
-//                byte[] utf8BytesCancel = new byte[4];
-//                utf8BytesCancel[0] = (byte)0xF0;
-//                utf8BytesCancel[1] = (byte)0x9F;
-//                utf8BytesCancel[2] = (byte)0x92;
-//                utf8BytesCancel[3] = (byte)0xA9;
-//                String cancelSymbol = "";
-//                byte[] utf8BytesCreate = new byte[4];
-//                utf8BytesCreate[0] = (byte)0xF0;
-//                utf8BytesCreate[1] = (byte)0x9F;
-//                utf8BytesCreate[2] = (byte)0x9A;
-//                utf8BytesCreate[3] = (byte)0x80;
-//                String createSymbol = "";
-//                byte[] utf8BytesShow = new byte[4];
-//                utf8BytesShow[0] = (byte)0xF0;
-//                utf8BytesShow[1] = (byte)0x9F;
-//                utf8BytesShow[2] = (byte)0x94;
-//                utf8BytesShow[3] = (byte)0xAE;
-//                String showSymbol = "";
-//                try {
-//                    joinSymbol = new String(utf8BytesJoin, "UTF-8");
-//                    cancelSymbol = new String(utf8BytesCancel, "UTF-8");
-//                    showSymbol  = new String(utf8BytesShow, "UTF-8");
-//                    createSymbol = new String(utf8BytesCreate, "UTF-8");
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
                 logger.info(req.body());
                 JsonElement jsonElement = new JsonParser().parse(req.body());
                 Message requestMessage = g.fromJson(jsonElement.getAsJsonObject().getAsJsonObject("message").toString(),
