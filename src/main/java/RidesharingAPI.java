@@ -26,7 +26,6 @@ public class RidesharingAPI {
 
     public RidesharingAPI(final UserDAO userDAO, final RideSuggestionDAO rideSuggestionDAO,
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO, final DeviceDAO deviceDAO) {
-//        Spark.setSecure();
         Spark.setPort(8443);
         Gson g = new Gson();
         Spark.options("/*", (request, response) -> {
@@ -90,20 +89,6 @@ public class RidesharingAPI {
         }, JsonUtil.json());
 
         post("/register", (req, res) ->{
-//                    try {
-//                        sendPush();
-//                    try {
-//                        sendPush("Test Message", DeviceType.IOS, "tokentokentokentoken");
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                        System.out.println(e.getMessage());
-//                        System.out.println(e.getLocalizedMessage());
-//                        System.out.println(e.toString());
-//                        //System.Diagnostics.Debug.WriteLine(new StreamReader(ex.Response.GetResponseStream()).ReadToEnd());
-//                    }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
                     Hashtable<String, String> registerResult = new Hashtable<>();
                     registerResult.put("Status", "-1");
                     if(isNull(Arrays.asList("login", "password","firstName", "lastName", "phone"), req)){
@@ -213,7 +198,6 @@ public class RidesharingAPI {
                 },
                 JsonUtil.json());
 
-        //return sharedRideId or SuggestionId
         post("/joinRide", (req, res) -> {
 
                     Hashtable<String, String> joinRideResult = new Hashtable<>();
@@ -265,10 +249,13 @@ public class RidesharingAPI {
                 JsonElement jsonElement = new JsonParser().parse(req.body());
                 Message requestMessage = g.fromJson(jsonElement.getAsJsonObject().getAsJsonObject("message").toString(),
                         Message.class);
-                if (requestMessage.getText() == null)
-                    return "OK";
-                String text = requestMessage.getText().toLowerCase();
                 int chatId = requestMessage.getChat().getId();
+                if (requestMessage.getText() == null){
+                    sendPost(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
+                    return "OK";
+                }
+                String text = requestMessage.getText().toLowerCase();
+
                 String login = "";
                 if (requestMessage.getFrom().getUsername() != null){
                     logger.info(requestMessage.getFrom().getUsername());
@@ -286,7 +273,6 @@ public class RidesharingAPI {
                     return "OK";
                 }
                 if (text.startsWith("/start") || text.startsWith("/help")) {
-
                     sendPost(requestMessage.getChat().getId(), TelegramBotResponses.START, getReplyMarkup());
                     return "OK";
                 }
@@ -335,6 +321,7 @@ public class RidesharingAPI {
                             sendPost(requestMessage.getChat().getId(), formatGetRidesResponseWithRoute(rideDetails), getReplyMarkup());
                         }
                     }
+                    sendPost(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
                     return "OK";
                 }
                 if (text.startsWith("/create") || text.startsWith("create") ||
@@ -364,7 +351,7 @@ public class RidesharingAPI {
                         user.setLastName(lastName);
                         user.setFirstName(firstName);
                         if(userDAO.update(chatId, username, firstName,lastName).get("Status").equals("-1")){
-                            sendPost(chatId, TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
+                            sendPost(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
                             return "OK";
                         }
                     }
@@ -397,15 +384,12 @@ public class RidesharingAPI {
                     }
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(new Date());
-                    //todo exclude magic number 1, edit timezone
-//                cal.set(Calendar.HOUR_OF_DAY, hours-1);
                     cal.set(Calendar.HOUR_OF_DAY, hours);
                     cal.set(Calendar.MINUTE, minutes);
                     if (cal.getTime().before(new Date()))
                         cal.add(Calendar.DAY_OF_MONTH, 1);
 
                     rideSuggestion.setRideTime(new Timestamp(cal.getTime().getTime()));
-
                     if (rideSuggestion.getDestinationPoint().equals("kazan") || rideSuggestion.getDestinationPoint().equals("казань")) {
                         rideSuggestion.setStartPoint("innopolis");
                     } else if (rideSuggestion.getDestinationPoint().equals("innopolis") || rideSuggestion.getDestinationPoint().equals("иннополис")) {
@@ -413,9 +397,10 @@ public class RidesharingAPI {
                     }
                     rideSuggestion.setCapacity(3);
                     rideSuggestion.setFreeSeatsNumber(3);
-//                    user = userDAO.getUserByChatId(chatId);
-                    if (user.getId() == 0)
+                    if (user.getId() == 0){
+                        logger.error("UserId == 0");
                         return "OK";
+                    }
                     rideSuggestion.setUserId(user.getId());
                     String rideId = rideSuggestionDAO.createRideSuggestion(rideSuggestion).get("RideId");
                     if (rideId == null) {
@@ -456,11 +441,11 @@ public class RidesharingAPI {
                         }
                         sendPost(chatId, " %F0%9F%8E%89 You successfully canceled the ride with ID: " + rideId + "! Please, notify your driver or passengers if there are any", getReplyMarkup());
                     } catch (SQLException e) {
-                        logger.error(e.getMessage());
+                        logger.error(e.getMessage() + " : " + e.getCause()+" : " + e.toString());
                         return "OK";
                     }
+                    logger.error("cancel");
                     return "OK";
-
                 }
                 if (text.startsWith(TelegramBotResponses.joinSymbol+" join")|| text.startsWith("join") ||
                         text.startsWith("/join")) {
@@ -519,13 +504,11 @@ public class RidesharingAPI {
         after((req, res) -> res.type("application/json"));
 
         exception(IllegalArgumentException.class, (e, req, res) -> {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage() + " : " + e.getCause()+" : " + e.toString());
             res.status(400);
             res.body(JsonUtil.toJson(new ResponseError(e)));
         });
     }
-
-
 
     private boolean isNull(List<String> parameters, spark.Request request){
         for(String parameter : parameters){
@@ -551,105 +534,6 @@ public class RidesharingAPI {
         return matcher.matches();
     }
 
-    private Hashtable<DeviceType, String> getDeviceInfo(String userId){
-        Hashtable<DeviceType, String> resultDeviceInfo = new Hashtable<>();
-        resultDeviceInfo.put(DeviceType.ANDROID, "");
-
-
-
-        return resultDeviceInfo;
-    }
-//    private boolean sendJoinPush(int passangerId, int driverId, int rideSuggestionId){
-//        Map<String, String> contents = new HashMap<>();
-//        contents.put("en","Test English Message");
-//        String[] includeIosTokens = {"Hello"};
-//        String[] includeAndroidRegIds = null;
-//        String[] includeWpUris = null;
-//        PushNotification pushNotification = new PushNotification(contents, true, includeIosTokens, false,
-//                includeAndroidRegIds ,false, includeWpUris);
-//        try {
-//            pushNotification.sendPush();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//        return true;
-//    }
-
-//    private boolean sendPush(String message, DeviceType deviceType, String tokens) throws IOException {
-//        String contents;
-//        switch (deviceType){
-//            case IOS:{
-//                contents = "{"
-//                        + "\"app_id\": \"32fed59e-3b83-11e5-b5c8-9f93493279d9\","
-//                        + "\"contents\": {\"en\": \"" + message + "\"},"
-//                        +"\"include_ios_tokens\": " + tokens + ", "
-//                        + "\"isIos\": true"
-//                        + "}";
-//                break;
-//            }
-//            case ANDROID:{
-//                contents = "{"
-//                        + "\"app_id\": \"32fed59e-3b83-11e5-b5c8-9f93493279d9\","
-//                        + "\"contents\": {\"en\": \""+ message +"\"},"
-//                        +"\"include_android_reg_ids\": " + tokens + ", "
-//                        + "\"isAndroid\": true"
-//                        + "}";
-//                break;
-//            }
-//            case WINDOWS_PHONE:{
-//                contents = "{"
-//                        + "\"app_id\": \"32fed59e-3b83-11e5-b5c8-9f93493279d9\","
-//                        + "\"contents\": {\"en\": \""+ message +"\"},"
-//                        +"\"include_wp_uris\": " + tokens + ", "
-//                        + "\"isWP:\": true"
-//                        + "}";
-//                break;
-//            }
-//            default:
-//                return false;
-//        }
-//
-//        String url = "https://onesignal.com/api/v1/notifications";
-//        String method = "POST";
-//        String contentType = "application/json";
-//
-//        URL u = new URL(url);
-//        HttpURLConnection conn = (HttpURLConnection)u.openConnection();
-//        conn.setRequestMethod(method);
-//        conn.setRequestProperty("Content-Type", contentType);
-//        conn.setRequestProperty("Content-Length", ""+contents.length());
-//        conn.setUseCaches(false);
-//        conn.setDoInput(true);
-//        conn.setDoOutput(true);
-//
-//        conn.setRequestProperty("Authorization", "Basic " + "MzJmZWQ2MmEtM2I4My0xMWU1LWI1YzktNWY1MTUzMGI2Y2Fi");
-//
-//
-//        OutputStream os = conn.getOutputStream();
-//        DataOutputStream wr = new DataOutputStream(os);
-//        wr.writeBytes (contents);
-//        wr.flush ();
-//        wr.close ();
-//
-//        try {
-//
-//            InputStream is = conn.getInputStream();
-//
-//        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-//        String line;
-//        StringBuffer response = new StringBuffer();
-//        while((line = rd.readLine()) != null) {
-//            response.append(line);
-//            response.append('\r');
-//        }
-//        rd.close();
-//        }catch(IOException e){
-//
-//        }
-//        return true;
-//    }
-
     private boolean sendPost(int chatId, String message, String replyMarkup){
         String url = "https://api.telegram.org/bot86148492:AAGLv840yestS5KiGODS-K0SZ2OWyp8IJ3c/sendMessage";
         URL obj;
@@ -673,7 +557,7 @@ public class RidesharingAPI {
         }
         return true;
     }
-    String formatGetRidesResponse(RideDetails rideDetails){
+    private String formatGetRidesResponse(RideDetails rideDetails){
         String responseMessage = "";
         responseMessage += "ID: " + rideDetails.getRideSuggestionId() + System.lineSeparator();
         responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
@@ -682,7 +566,7 @@ public class RidesharingAPI {
         //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         return responseMessage;
     }
-    String formatGetRidesResponseWithRoute(RideDetails rideDetails){
+    private String formatGetRidesResponseWithRoute(RideDetails rideDetails){
         String responseMessage = "";
         responseMessage += "ID: " + rideDetails.getRideSuggestionId() + System.lineSeparator();
         responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
@@ -691,7 +575,7 @@ public class RidesharingAPI {
         //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         return responseMessage;
     }
-    String formatRideSuggestion(RideSuggestion rideSuggestion){
+    private String formatRideSuggestion(RideSuggestion rideSuggestion){
         String responseMessage = "";
         responseMessage += "ID: " + rideSuggestion.getRideSuggestionId() + System.lineSeparator();
         responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideSuggestion.getRideTime()) + System.lineSeparator();
@@ -700,7 +584,7 @@ public class RidesharingAPI {
         return responseMessage;
 
     }
-    String getReplyMarkup(){
+    private String getReplyMarkup(){
         ReplyKeyboardMarkup.Builder builder = new ReplyKeyboardMarkup.Builder();
         builder.row(TelegramBotResponses.KEYBORD_JOIN_ICON, TelegramBotResponses.KEYBORD_SHOW_ICON);//create getrideslist delete join
         builder.row(TelegramBotResponses.KEYBORD_CREATE_ICON, TelegramBotResponses.KEYBORD_CANCEL_ICON);//, "New Ride");//, "Join", "Unjoin", "Delete Ride");
