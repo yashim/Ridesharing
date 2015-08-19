@@ -274,20 +274,21 @@ public class RidesharingAPI {
                     logger.info(requestMessage.getFrom().getUsername());
                     login = requestMessage.getFrom().getUsername();
                 }
+                try {
+                    if (!userDAO.exist(chatId)) {
+                        String firstName = requestMessage.getFrom().getFirstName()==null?"":requestMessage.getFrom().getFirstName();
+                        String lastName = requestMessage.getFrom().getLastName()==null?"":requestMessage.getFrom().getLastName();
+                        userDAO.createUserFromTelegram(new User(login, "", firstName,
+                                lastName, ""), chatId);
+                    }
+                } catch (SQLException e) {
+                    sendPost(requestMessage.getChat().getId(), TelegramBotResponses.ERROR, getReplyMarkup());
+                    return "OK";
+                }
 
                 //String[] params = text.split(" ");
                 if (text.startsWith("/start") || text.startsWith("/help")) {
-                    try {
-                        if (!userDAO.exist(chatId)) {
-                            String firstName = requestMessage.getFrom().getFirstName()==null?"":requestMessage.getFrom().getFirstName();
-                            String lastName = requestMessage.getFrom().getLastName()==null?"":requestMessage.getFrom().getLastName();
-                            userDAO.createUserFromTelegram(new User(login, "", firstName,
-                                    lastName, ""), chatId);
-                        }
-                    } catch (SQLException e) {
-                        sendPost(requestMessage.getChat().getId(), TelegramBotResponses.ERROR, getReplyMarkup());
-                        return "OK";
-                    }
+
                     sendPost(requestMessage.getChat().getId(), TelegramBotResponses.START, getReplyMarkup());
                     return "OK";
                 }
