@@ -270,8 +270,10 @@ public class RidesharingAPI {
                 String text = requestMessage.getText().toLowerCase();
                 int chatId = requestMessage.getChat().getId();
                 String login = "";
-                if (requestMessage.getFrom().getUsername() != null || !requestMessage.getFrom().getUsername().equals(""))
+                if (requestMessage.getFrom().getUsername() != null){
+                    logger.info(requestMessage.getFrom().getUsername());
                     login = requestMessage.getFrom().getUsername();
+                }
 
                 //String[] params = text.split(" ");
                 if (text.startsWith("/start") || text.startsWith("/help")) {
