@@ -509,7 +509,7 @@ public class RidesharingAPI {
                 sendPost(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
                 return "OK";
             }catch(Exception e){
-                logger.error(e.getMessage() + " : " + e.getCause());
+                logger.error(e.getMessage() + " : " + e.getCause()+" : " + e.toString());
                 return "OK";
             }
         }, JsonUtil.json());
