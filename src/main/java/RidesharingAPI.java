@@ -123,10 +123,16 @@ public class RidesharingAPI {
         post("/login", (req, res) -> {
                     Hashtable<String, String> loginResult = new Hashtable<>();
                     loginResult.put("Status", "-1");
-                    if(isNull(Arrays.asList("login", "password"), req)){
+                    if(isNull(Arrays.asList("login", "password", "pushToken", "os"), req)){
                         return loginResult;
                     }
-                    return tokenDAO.login(req.queryParams("login"), req.queryParams("password"));
+                    loginResult = tokenDAO.login(req.queryParams("login"), req.queryParams("password"));
+                    if(loginResult.get("Status").equals("0")){
+                        deviceDAO.createDevice(new Device(0, Integer.parseInt(loginResult.get("UserId")),
+                                req.queryParams("pushToken"), req.queryParams("os"), new Timestamp(new java.util.Date().getTime())));
+                        loginResult.put("DeviceRegistered", "0");
+                    }
+                    return loginResult;
                 },
                 JsonUtil.json());
 
