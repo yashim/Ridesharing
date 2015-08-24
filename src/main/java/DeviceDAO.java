@@ -21,6 +21,21 @@ public class DeviceDAO {
         createDeviceResult.put("Status", "-1");
         try {
             connection = ConnectionFactory.getConnection();
+            ResultSet rs;
+            int deviceId = -1;
+            preparedStatement = connection.prepareCall("SELECT * FROM devices WHERE user_id=? AND token=?");
+            preparedStatement.setInt(1, device.getUserId());
+            preparedStatement.setString(2, device.getToken());
+            preparedStatement.execute();
+            rs = preparedStatement.getResultSet();
+            while (rs.next()) {
+                deviceId = rs.getInt("device_id");
+            }
+            if(deviceId!=-1){
+                createDeviceResult.replace("Status", "0");
+                createDeviceResult.put("DeviceId", Integer.toString(deviceId));
+                return createDeviceResult;
+            }
             String sqlInsertReview = "INSERT INTO devices (user_id, token, os) " +
                     "VALUES (?, ?, ?)";
             preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
