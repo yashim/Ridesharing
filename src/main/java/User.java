@@ -6,7 +6,9 @@ public class User {
     private String password;
     private String phone;
     private int id;
-    private int chatid;
+    private int chatId;
+    private UserType type;
+    private boolean enableNotifications;
 
     public User() {
     }
@@ -17,6 +19,27 @@ public class User {
         this.login = login;
         this.password = password;
         this.phone = phone;
+        this.type = UserType.UNDIFINED;
+        this.enableNotifications = false;
+    }
+    public User(String login, String password, String firstName, String lastName, String phone, UserType type) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.login = login;
+        this.password = password;
+        this.phone = phone;
+        this.type = type;
+        this.enableNotifications = false;
+    }
+    public User(String login, String password, String firstName, String lastName, String phone, UserType type,
+                boolean enableNotifications) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.login = login;
+        this.password = password;
+        this.phone = phone;
+        this.type = type;
+        this.enableNotifications = enableNotifications;
     }
 
     public String getPhone() {
@@ -67,11 +90,19 @@ public class User {
         this.id = id;
     }
 
-    public int getChatid() {
-        return chatid;
+    public int getChatId() {
+        return chatId;
     }
 
-    public void setChatid(int chatid) {
-        this.chatid = chatid;
+    public void setChatId(int chatId) {
+        this.chatId = chatId;
+    }
+
+    public UserType getType() {
+        return type;
+    }
+
+    public void setType(UserType type) {
+        this.type = type;
     }
 }

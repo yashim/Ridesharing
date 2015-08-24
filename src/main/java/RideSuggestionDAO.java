@@ -458,7 +458,7 @@ public class RideSuggestionDAO {
             rideDetails.setDriverLastName(user.getLastName());
             rideDetails.setDriverName(user.getFirstName());
             rideDetails.setDriverPhone(user.getPhone());
-            rideDetails.setChatId(user.getChatid());
+            rideDetails.setChatId(user.getChatId());
             rideDetails.setDriverLogin(user.getLogin());
 
         } catch (SQLException e) {

@@ -26,7 +26,7 @@ public class RidesharingAPI {
 
     public RidesharingAPI(final UserDAO userDAO, final RideSuggestionDAO rideSuggestionDAO,
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO, final DeviceDAO deviceDAO) {
-        Spark.setPort(8443);
+        Spark.setPort(4567);
         Gson g = new Gson();
         Spark.options("/*", (request, response) -> {
 
@@ -128,9 +128,11 @@ public class RidesharingAPI {
                     }
                     loginResult = tokenDAO.login(req.queryParams("login"), req.queryParams("password"));
                     if(loginResult.get("Status").equals("0")){
-                        deviceDAO.createDevice(new Device(0, Integer.parseInt(loginResult.get("UserId")),
+                        Hashtable<String, String> deviceResult = deviceDAO.createDevice(new Device(0, Integer.parseInt(loginResult.get("UserId")),
                                 req.queryParams("pushToken"), req.queryParams("os"), new Timestamp(new java.util.Date().getTime())));
-                        loginResult.put("DeviceRegistered", "0");
+                        if(deviceResult.get("Status").equals("0")){
+                            loginResult.put("DeviceId", deviceResult.get("DeviceId"));
+                        }
                     }
                     return loginResult;
                 },
@@ -416,6 +418,11 @@ public class RidesharingAPI {
                     rideSuggestion.setRideSuggestionId(Integer.parseInt(rideId));
                     sendPost(requestMessage.getChat().getId(), "%F0%9F%8E%89 You successfully created the ride!" + System.lineSeparator() +
                             formatRideSuggestion(rideSuggestion), getReplyMarkup());
+
+                    UserNotification notification = new UserNotification(rideSuggestion);
+                    Thread t = new Thread(notification);
+                    t.start();
+
                     return "OK";
                 }
                 //todo notify passengers

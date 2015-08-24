@@ -129,7 +129,7 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setPhone(rs.getString("phone"));
                 user.setId(rs.getInt("user_id"));
-                user.setChatid(rs.getInt("chat_id"));
+                user.setChatId(rs.getInt("chat_id"));
             }
         } catch (SQLException e) {
             logger.error(e.getErrorCode() + ":" + e.getMessage());
@@ -158,7 +158,7 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setPhone(rs.getString("phone"));
                 user.setId(rs.getInt("user_id"));
-                user.setChatid(rs.getInt("chat_id"));
+                user.setChatId(rs.getInt("chat_id"));
             }
         } catch (SQLException e) {
             logger.error(e.getErrorCode() + ":" + e.getMessage());
@@ -190,7 +190,7 @@ public class UserDAO {
                 user.setLogin(rs.getString("login"));
                 user.setPassword("");
                 user.setPhone(rs.getString("phone"));
-                user.setChatid(rs.getInt("chat_id"));
+                user.setChatId(rs.getInt("chat_id"));
             }
             getUserResult.replace("Status", "0");
             getUserResult.put("User", user);
@@ -304,5 +304,4 @@ public class UserDAO {
         ResultSet result = preparedStatement.getResultSet();
         return result.next();
     }
-
 }

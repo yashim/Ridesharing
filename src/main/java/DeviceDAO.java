@@ -17,8 +17,8 @@ public class DeviceDAO {
 
     public Hashtable<String, String> createDevice(Device device) {
         ResultSet generatedKeys;
-        Hashtable<String, String> createUserResult = new Hashtable<>();
-        createUserResult.put("Status","-1");
+        Hashtable<String, String> createDeviceResult = new Hashtable<>();
+        createDeviceResult.put("Status", "-1");
         try {
             connection = ConnectionFactory.getConnection();
             String sqlInsertReview = "INSERT INTO devices (user_id, token, os) " +
@@ -33,8 +33,8 @@ public class DeviceDAO {
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
-                createUserResult.replace("Status", "0");
-                createUserResult.put("DeviceId",Integer.toString(generatedKeys.getInt(1)));
+                createDeviceResult.replace("Status", "0");
+                createDeviceResult.put("DeviceId", Integer.toString(generatedKeys.getInt(1)));
             }
         } catch (SQLException e) {
             logger.error(e.getErrorCode() +":"+ e.getMessage() + ":");
@@ -42,7 +42,7 @@ public class DeviceDAO {
             DbUtil.close(preparedStatement);
             DbUtil.close(connection);
         }
-        return createUserResult;
+        return createDeviceResult;
     }
     public Device getDevice(int deviceId) {
         ResultSet rs = null;
