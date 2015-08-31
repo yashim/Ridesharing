@@ -20,18 +20,28 @@ public class RideDetails extends RideSuggestion {
         this.driverPhone = driverPhone;
     }
 
-    public RideDetails(int userId, String startPoint, String destinationPoint, Timestamp rideTime, int timeLag, int capacity, int free_seats_number, String driverName, String driverLastName, String driverPhone) {
-        super(userId, startPoint, destinationPoint, rideTime, timeLag, capacity, free_seats_number);
+    public RideDetails(int userId, String startPoint, String destinationPoint, Timestamp rideTime, int timeLag,
+                       int capacity, int freeSeatsNumber, String driverName, String driverLastName, String driverPhone) {
+        super(userId, startPoint, destinationPoint, rideTime, timeLag, capacity, freeSeatsNumber);
         this.driverName = driverName;
         this.driverLastName = driverLastName;
         this.driverPhone = driverPhone;
     }
 
-    public RideDetails(int rideSuggestionId, int userId, String startPoint, String destinationPoint, Timestamp rideTime, int timeLag, int capacity, int free_seats_number, String driverName, String driverLastName, String driverPhone) {
-        super(rideSuggestionId, userId, startPoint, destinationPoint, rideTime, timeLag, capacity, free_seats_number);
+    public RideDetails(int rideSuggestionId, int userId, String startPoint, String destinationPoint, Timestamp rideTime,
+                       int timeLag, int capacity, int freeSeatsNumber, String driverName, String driverLastName, String driverPhone) {
+        super(rideSuggestionId, userId, startPoint, destinationPoint, rideTime, timeLag, capacity, freeSeatsNumber);
         this.driverName = driverName;
         this.driverLastName = driverLastName;
         this.driverPhone = driverPhone;
+    }
+    public RideDetails(RideSuggestion rideSuggestion, String driverName, String driverLastName, String driverLogin){
+        super(rideSuggestion.getRideSuggestionId(), rideSuggestion.getUserId(), rideSuggestion.getStartPoint(),
+                rideSuggestion.getDestinationPoint(), rideSuggestion.getRideTime(), rideSuggestion.getTimeLag(),
+                rideSuggestion.getCapacity(), rideSuggestion.getFreeSeatsNumber());
+        this.driverName = driverName;
+        this.driverLastName = driverLastName;
+        this.driverLogin = driverLogin;
     }
 
     public String getDriverName() {

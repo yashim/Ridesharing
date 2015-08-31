@@ -45,11 +45,44 @@ public class SubscriptionDAO {
         }
         return createUserResult;
     }
-    public void delete(int id) throws SQLException {
+
+    public Hashtable<String, String> createSubscription(Subscription subscription) {
+        ResultSet generatedKeys;
+        Hashtable<String, String> createUserResult = new Hashtable<>();
+        createUserResult.put("Status","-1");
+        try {
+            connection = ConnectionFactory.getConnection();
+            String sqlInsertReview = "INSERT INTO subscriptions (user_id, chat_id, start_point, destination_point) " +
+                    "VALUES (?, ? ,? ,?)";
+            preparedStatement = connection.prepareStatement(sqlInsertReview, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, subscription.getUserId());
+            preparedStatement.setInt(2, subscription.getChatId());
+            preparedStatement.setString(3, subscription.getStartPoint());
+            preparedStatement.setString(4, subscription.getDestinationPoint());
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating subscription failed, no rows affected.");
+            }
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                createUserResult.replace("Status", "0");
+                createUserResult.put("SubscriptionId",Integer.toString(generatedKeys.getInt(1)));
+            }
+        } catch (SQLException e) {
+            logger.error(e.getErrorCode() +":"+ e.getMessage() + ":");
+        } finally {
+            DbUtil.close(preparedStatement);
+            DbUtil.close(connection);
+        }
+        return createUserResult;
+    }
+
+    public void delete(int userId) throws SQLException {
         try {
             connection = ConnectionFactory.getConnection();
             preparedStatement = connection.prepareCall("DELETE FROM subscriptions WHERE user_id=?");
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, userId);
             preparedStatement.execute();
         }
         finally {
@@ -76,7 +109,7 @@ public class SubscriptionDAO {
         CopyOnWriteArrayList<Subscription> subscriptionsList = new CopyOnWriteArrayList<>();
         try {
             connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("SELECT * FROM users");
+            preparedStatement = connection.prepareCall("SELECT * FROM subscriptions");
             preparedStatement.execute();
             rs = preparedStatement.getResultSet();
             while (rs.next()) {
@@ -91,6 +124,15 @@ public class SubscriptionDAO {
             DbUtil.close(connection);
         }
         return subscriptionsList;
+    }
+
+    public boolean exist (int userId) throws SQLException {
+        connection = ConnectionFactory.getConnection();
+        preparedStatement = connection.prepareCall("SELECT 1 FROM subscriptions WHERE user_id =?");
+        preparedStatement.setInt(1, userId);
+        preparedStatement.execute();
+        ResultSet result = preparedStatement.getResultSet();
+        return result.next();
     }
 
     private Subscription convertResultSetToSubscription(ResultSet rs) throws SQLException{

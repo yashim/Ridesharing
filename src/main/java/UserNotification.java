@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import telegrambotapi.types.ReplyKeyboardMarkup;
@@ -15,6 +16,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Creation date: 8/24/15.
  */
 public class UserNotification implements Runnable {
+    private final Thread thread;
+    private volatile boolean shouldStop = false;
     public static CopyOnWriteArrayList<Subscription> subscriptionsList = new CopyOnWriteArrayList<>();
 
     protected Connection connection;
@@ -25,18 +28,29 @@ public class UserNotification implements Runnable {
     static{
         initUserList();
     }
-    private RideSuggestion rideSuggestion;
+    private RideDetails rideDetails;
 
-    public UserNotification(RideSuggestion rideSuggestion) {
-        this.rideSuggestion = rideSuggestion;
+    public UserNotification(RideDetails rideDetails) {
+        this.rideDetails = rideDetails;
+        thread = new Thread (this, "Thread for sending notifications");
     }
 
-    public void sendNotifications(RideSuggestion rideSuggestion){
-        for(Subscription subscription : subscriptionsList){
-//            sendPost(user.getChatId(), "Testing broadcasting", getReplyMarkup());
-            System.out.println(subscription.getChatId() +" there is new ride to " + rideSuggestion.getDestinationPoint()
-                    + " at " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideSuggestion.getRideTime()));
+    public void start() {
+        thread.start();
+    }
 
+    public void stop() {
+        shouldStop = true;
+    }
+
+    public void sendNotifications(RideDetails rideDetails){
+        for(Subscription subscription : subscriptionsList){
+            if(rideDetails.getUserId()==subscription.getUserId())
+                continue;
+            sendPost(subscription.getChatId(), "@" + rideDetails.getDriverLogin() + " has created a ride from "+
+                        WordUtils.capitalize(rideDetails.getStartPoint()) + " to "
+                        + WordUtils.capitalize(rideDetails.getDestinationPoint())+". Departure on " +
+                        new SimpleDateFormat("EEEE, dd MMMM, HH:mm").format(rideDetails.getRideTime()), getReplyMarkup());
         }
     }
 
@@ -46,7 +60,7 @@ public class UserNotification implements Runnable {
     }
 
     private static boolean sendPost(int chatId, String message, String replyMarkup){
-        String url = "https://api.telegram.org/bot86148492:AAGLv840yestS5KiGODS-K0SZ2OWyp8IJ3c/sendMessage";
+        String url = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
         URL obj;
         try {
             obj = new URL(url);
@@ -79,6 +93,17 @@ public class UserNotification implements Runnable {
 
     @Override
     public void run() {
-        sendNotifications(rideSuggestion);
+//        while(!shouldStop){
+            sendNotifications(rideDetails);
+//        }
+    }
+
+    public static boolean containsUserId(int userId) {
+        for (Subscription subscription : subscriptionsList) {
+            if (subscription.getUserId() == userId) {
+                return true;
+            }
+        }
+        return false;
     }
 }

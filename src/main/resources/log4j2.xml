@@ -14,6 +14,11 @@
                 <Pattern>%d %p %c{1.} %L [%t] %m%n</Pattern>
             </PatternLayout>
         </File>
+        <File name="FileDebug" fileName="logs/debug.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} %L [%t] %m%n</Pattern>
+            </PatternLayout>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="error">
@@ -22,6 +27,9 @@
         </Root>
         <Root level="info">
             <AppenderRef ref="FileTelegram"/>
+        </Root>
+        <Root level="debug">
+            <AppenderRef ref="FileDebug"/>
         </Root>
     </Loggers>
 </Configuration>

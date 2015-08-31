@@ -3,5 +3,5 @@
  * Creation date: 8/10/15.
  */
 public enum DeviceType {
-    IOS, ANDROID, WINPHONE
+    IOS, ANDROID, AMAZON, WINPHONE
 }

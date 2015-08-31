@@ -15,6 +15,13 @@ public class Subscription {
     public Subscription() {
     }
 
+    public Subscription(int userId, int chatId, String startPoint, String destinationPoint) {
+        this.userId = userId;
+        this.chatId = chatId;
+        this.startPoint = startPoint;
+        this.destinationPoint = destinationPoint;
+    }
+
     public Subscription(int id, int userId, int chatId, String startPoint, String destinationPoint, Timestamp creationTime) {
         this.id = id;
         this.userId = userId;
@@ -70,5 +77,14 @@ public class Subscription {
 
     public void setCreationTime(Timestamp creationTime) {
         this.creationTime = creationTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Subscription) {
+            Subscription subscription = (Subscription)o;
+            return (this.id == subscription.id);
+        }
+        return false;
     }
 }

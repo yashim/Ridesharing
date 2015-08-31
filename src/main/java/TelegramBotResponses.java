@@ -33,6 +33,12 @@ public class TelegramBotResponses {
     public final static String CREATE_WRONG_CITY = "Please specify the first word - Destination point of your journey - as Kazan or Innopolis, here is my modest examples: \"Kazan 14:50\" or \"Innopolis 20:40\", or \""+ KAZAN +" 19:00\", or \""+ INNOPOLIS +" 8:00\"";
     public final static String CREATE_WRONG_PARAMETERS = "In order to create a triumphant ride please specify a Destination point as the first word and Departure time as the second word. Here is my humble examples: \"Kazan 14:50\" or \"Innopolis 20:40\", or \""+ KAZAN +" 19:00\", or \""+ INNOPOLIS +" 8:00\"";
     public final static String DELETE_INFO = "Your Highness, please select the ride you want to cancel. To do this, please tap Show and then reply to the message with Cancel.";
+    //todo change description
+    public final static String NOTIFY_WRONG_PARAMETERS = "Your Highness, please type \"notify on\" or \"notify off\" in order to get notifications about new rides or not.";
+    public final static String NOTIFY_ON = "Your Highness, from now you will be notified about new rides.";
+    public final static String NOTIFY_OFF = "Your Highness, from now you will not get notifications about new rides.";
+
+
 
     private static final byte[] utf8BytesJoin = new byte[4];
     private static final byte[] utf8BytesCancel = new byte[4];
