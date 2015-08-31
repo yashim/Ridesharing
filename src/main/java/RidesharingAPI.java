@@ -30,7 +30,6 @@ public class RidesharingAPI {
         Spark.setPort(4567);
         Gson g = new Gson();
         Spark.options("/*", (request, response) -> {
-
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
             if (accessControlRequestHeaders != null) {
                 response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
@@ -596,11 +595,11 @@ public class RidesharingAPI {
     }
 
     private boolean sendMessageToTelegram(int chatId, String message, String replyMarkup){
-        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
-        //String url = "https://api.telegram.org/bot86148492:AAGLv840yestS5KiGODS-K0SZ2OWyp8IJ3c/sendMessage";
+//        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
+        String url = "https://api.telegram.org/bot86148492:AAGLv840yestS5KiGODS-K0SZ2OWyp8IJ3c/sendMessage";
         URL obj;
         try {
-            obj = new URL(testUrl);
+            obj = new URL(url);
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
