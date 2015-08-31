@@ -60,7 +60,8 @@ public class UserNotification implements Runnable {
     }
 
     private static boolean sendPost(int chatId, String message, String replyMarkup){
-        String url = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
+//        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
+        String url = "https://api.telegram.org/bot86148492:AAGLv840yestS5KiGODS-K0SZ2OWyp8IJ3c/sendMessage";
         URL obj;
         try {
             obj = new URL(url);
