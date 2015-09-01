@@ -542,7 +542,7 @@ public class RidesharingAPI {
                     logger.debug("No correct conditions NOTIFY");
                     return "OK";
                 }
-                if (text.toLowerCase().startsWith("/notifyon")) {
+                if (text.toLowerCase().startsWith("/notify_on")) {
                     User user = userDAO.getUserByChatId(chatId);
                     if(UserNotification.containsUserId(user.getId()) || subscriptionDAO.exist(user.getId()) ){
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
@@ -555,7 +555,7 @@ public class RidesharingAPI {
                     sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
                     return "OK";
                 }
-                if (text.toLowerCase().startsWith("/notifyoff")){
+                if (text.toLowerCase().startsWith("/notify_off")){
                     User user = userDAO.getUserByChatId(chatId);
                     if(!subscriptionDAO.exist(user.getId())){
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_OFF, getReplyMarkup());
