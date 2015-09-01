@@ -28,8 +28,5 @@
         <Root level="info">
             <AppenderRef ref="FileTelegram"/>
         </Root>
-        <Root level="debug">
-            <AppenderRef ref="FileDebug"/>
-        </Root>
     </Loggers>
 </Configuration>
