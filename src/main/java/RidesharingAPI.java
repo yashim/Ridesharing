@@ -509,7 +509,7 @@ public class RidesharingAPI {
                     return "OK";
                 }
                 //todo add to commands
-                if (text.toLowerCase().startsWith("/notify") || text.toLowerCase().startsWith("notify")) {
+                if (text.toLowerCase().startsWith("notify")) {
                     String[] params = text.split(" ");
                     if (params.length != 2) {
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_WRONG_PARAMETERS, getReplyMarkup());
