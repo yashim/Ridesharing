@@ -453,15 +453,13 @@ public class RidesharingAPI {
                                 sendMessageToTelegram(chatId, "%F0%9F%90%B5 Sorry, you cannot cancel this ride", getReplyMarkup());
                                 return "OK";
                             }
-                            //sendMessageToTelegram(requestMessage.getChat().getId(), "You successfully deleted a ride with ID:"+rideId+"!", getReplyMarkup());
                         }
                         sendMessageToTelegram(chatId, " %F0%9F%8E%89 You successfully canceled the ride with ID: " + rideId + "! Please, notify your driver or passengers if there are any", getReplyMarkup());
+                        return "OK";
                     } catch (SQLException e) {
                         logger.error(e.getMessage() + " : " + e.getCause()+" : " + e.toString());
                         return "OK";
                     }
-                    logger.error("cancel");
-                    return "OK";
                 }
                 if (text.startsWith(TelegramBotResponses.joinSymbol+" join")|| text.startsWith("join") ||
                         text.startsWith("/join")) {
@@ -632,11 +630,12 @@ public class RidesharingAPI {
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+//            con.setRequestProperty("content-charset", "UTF-8");//content-charset
             String urlParameters = "chat_id=" + chatId + "&text=" + message+"&reply_markup="+replyMarkup;
 
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
+            wr.write(urlParameters.getBytes("UTF-8"));
             wr.flush();
             wr.close();
             int responseCode = con.getResponseCode();

@@ -128,11 +128,12 @@ public class TokenDAO {
 
     public boolean exist(String login) throws SQLException {
         connection = ConnectionFactory.getConnection();
-        preparedStatement = connection.prepareCall("SELECT 1 FROM users WHERE login =?");
+        preparedStatement = connection.prepareCall("SELECT EXISTS (SELECT 1 FROM users WHERE login =?) as result");
         preparedStatement.setString(1, login);
         preparedStatement.execute();
         ResultSet result = preparedStatement.getResultSet();
-        return result.next();
+        result.next();
+        return result.getBoolean("result");
     }
 
 }

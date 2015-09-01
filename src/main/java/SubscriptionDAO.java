@@ -128,11 +128,12 @@ public class SubscriptionDAO {
 
     public boolean exist (int userId) throws SQLException {
         connection = ConnectionFactory.getConnection();
-        preparedStatement = connection.prepareCall("SELECT 1 FROM subscriptions WHERE user_id =?");
+        preparedStatement = connection.prepareCall("SELECT EXISTS (SELECT 1 FROM subscriptions WHERE user_id =?) as result");
         preparedStatement.setInt(1, userId);
         preparedStatement.execute();
         ResultSet result = preparedStatement.getResultSet();
-        return result.next();
+        result.next();
+        return result.getBoolean("result");
     }
 
     private Subscription convertResultSetToSubscription(ResultSet rs) throws SQLException{

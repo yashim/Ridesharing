@@ -72,7 +72,7 @@ public class UserNotification implements Runnable {
 
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
+            wr.write(urlParameters.getBytes("UTF-8"));
             wr.flush();
             wr.close();
             int responseCode = con.getResponseCode();

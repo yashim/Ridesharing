@@ -103,13 +103,13 @@ public class UserDAO {
     }
 
     public boolean exist(int chatId) throws SQLException {
-        ResultSet result = null;
-            connection = ConnectionFactory.getConnection();
-            preparedStatement = connection.prepareCall("SELECT 1 FROM users WHERE chat_id =?");
-            preparedStatement.setInt(1, chatId);
-            preparedStatement.execute();
-            result = preparedStatement.getResultSet();
-        return result.next();
+        connection = ConnectionFactory.getConnection();
+        preparedStatement = connection.prepareCall("SELECT EXISTS (SELECT 1 FROM users WHERE chat_id =?) as result");
+        preparedStatement.setInt(1, chatId);
+        preparedStatement.execute();
+        ResultSet result = preparedStatement.getResultSet();
+        result.next();
+        return result.getBoolean("result");
     }
 
     public User getUserByChatId(int chatId) {
@@ -298,10 +298,12 @@ public class UserDAO {
 
     public boolean exist (String login) throws SQLException {
         connection = ConnectionFactory.getConnection();
-        preparedStatement = connection.prepareCall("SELECT 1 FROM users WHERE login =?");
+        preparedStatement = connection.prepareCall("SELECT EXISTS (SELECT 1 FROM users WHERE login =?) as result");
         preparedStatement.setString(1, login);
         preparedStatement.execute();
         ResultSet result = preparedStatement.getResultSet();
-        return result.next();
+        result = preparedStatement.getResultSet();
+        result.next();
+        return result.getBoolean("result");
     }
 }

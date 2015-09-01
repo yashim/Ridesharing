@@ -409,25 +409,27 @@ public class RideSuggestionDAO {
     }
 
     public boolean exist(int rideId, int userId) throws SQLException {
-        ResultSet result = null;
         connection = ConnectionFactory.getConnection();
-        preparedStatement = connection.prepareCall("SELECT 1 FROM ride_suggestions WHERE ride_suggestion_id =? AND user_id = ?");
+        preparedStatement = connection.prepareCall("SELECT EXISTS (SELECT 1 FROM ride_suggestions " +
+                "WHERE ride_suggestion_id =? AND user_id = ?) as result");
         preparedStatement.setInt(1, rideId);
         preparedStatement.setInt(2, userId);
         preparedStatement.execute();
-        result = preparedStatement.getResultSet();
-        return result.next();
+        ResultSet result = preparedStatement.getResultSet();
+        result.next();
+        return result.getBoolean("result");
     }
     public boolean exist(int rideId, int userId, Timestamp rideTime) throws SQLException {
-        ResultSet result = null;
         connection = ConnectionFactory.getConnection();
-        preparedStatement = connection.prepareCall("SELECT 1 FROM ride_suggestions WHERE ride_suggestion_id =? AND user_id = ? AND ride_time = ?");
+        preparedStatement = connection.prepareCall("SELECT EXISTS (SELECT 1 FROM ride_suggestions " +
+                "WHERE ride_suggestion_id =? AND user_id = ? AND ride_time = ?) as result");
         preparedStatement.setInt(1, rideId);
         preparedStatement.setInt(2, userId);
         preparedStatement.setTimestamp(3, rideTime);
         preparedStatement.execute();
-        result = preparedStatement.getResultSet();
-        return result.next();
+        ResultSet result = preparedStatement.getResultSet();
+        result.next();
+        return result.getBoolean("result");
     }
 
     public RideDetails getRide(int rideId) {
