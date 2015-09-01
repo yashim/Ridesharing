@@ -542,6 +542,35 @@ public class RidesharingAPI {
                     logger.debug("No correct conditions NOTIFY");
                     return "OK";
                 }
+                if (text.toLowerCase().startsWith("/notifyon")) {
+                    User user = userDAO.getUserByChatId(chatId);
+                    if(UserNotification.containsUserId(user.getId()) || subscriptionDAO.exist(user.getId()) ){
+                        sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
+                        return "OK";
+                    }
+                    Subscription subscription = new Subscription(user.getId(),chatId, "kazan", "innopolis");
+                    int subscriptionId  = Integer.parseInt(subscriptionDAO.createSubscription(subscription).get("SubscriptionId"));
+                    subscription.setId(subscriptionId);
+                    UserNotification.subscriptionsList.add(subscription);
+                    sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
+                    return "OK";
+                }
+                if (text.toLowerCase().startsWith("/notifyoff")){
+                    User user = userDAO.getUserByChatId(chatId);
+                    if(!subscriptionDAO.exist(user.getId())){
+                        sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_OFF, getReplyMarkup());
+                        return "OK";
+                    }
+                    subscriptionDAO.delete(user.getId());
+                    UserNotification.subscriptionsList.removeIf(p -> p.getUserId()==user.getId());
+                    sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_OFF, getReplyMarkup());
+                    return "OK";
+                }
+
+
+
+
+
                 sendMessageToTelegram(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
                 return "OK";
             }catch(Exception e){
