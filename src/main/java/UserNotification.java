@@ -9,6 +9,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -24,6 +25,12 @@ public class UserNotification implements Runnable {
     protected PreparedStatement preparedStatement;
 
     private final Logger logger = LogManager.getLogger(UserNotification.class);
+
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("EEEE, dd MMMM HH:mm"){
+        {
+            setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        }
+    };
 
     static{
         initUserList();
@@ -50,7 +57,7 @@ public class UserNotification implements Runnable {
             sendPost(subscription.getChatId(), "@" + rideDetails.getDriverLogin() + " has created a ride from "+
                         WordUtils.capitalize(rideDetails.getStartPoint()) + " to "
                         + WordUtils.capitalize(rideDetails.getDestinationPoint())+". Departure on " +
-                        new SimpleDateFormat("EEEE, dd MMMM, HH:mm").format(rideDetails.getRideTime()), getReplyMarkup());
+                    SIMPLE_DATE_FORMAT.format(rideDetails.getRideTime()), getReplyMarkup());
         }
     }
 
@@ -61,7 +68,7 @@ public class UserNotification implements Runnable {
 
     private static boolean sendPost(int chatId, String message, String replyMarkup){
 //        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
-        String url = "https://api.telegram.org/bot86148492:AAGLv840yestS5KiGODS-K0SZ2OWyp8IJ3c/sendMessage";
+        String url = "https://api.telegram.org/bot86148492:AAGSwyD91W9b-F26ZO1FrONs763yj63lDzE/sendMessage";
         URL obj;
         try {
             obj = new URL(url);

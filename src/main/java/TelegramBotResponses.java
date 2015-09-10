@@ -87,7 +87,4 @@ public class TelegramBotResponses {
     public final static String NO_AVAILABLE_RIDES_HEADER = "%F0%9F%9A%97 NO AVAILABLE RIDES %F0%9F%9A%97";
     public final static String NO_DRIVER_RIDES_HEADER = "%F0%9F%9A%98 NO RIDES WHERE YOU ARE A DRIVER %F0%9F%9A%98";
     public final static String NO_PASSENGER_RIDES_HEADER = "%F0%9F%92%BA NO RIDES WHERE YOU ARE A PASSENGER %F0%9F%92%BA";
-
-    //%F0%9F%9A%97 redcar
-    //%F0%9F%92%BA
 }

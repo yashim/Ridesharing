@@ -24,6 +24,12 @@ public class RidesharingAPI {
 
     private final Logger logger = LogManager.getLogger(RidesharingAPI.class);
 
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("EEEE, dd MMMM HH:mm"){
+        {
+            setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        }
+    };
+
     public RidesharingAPI(final UserDAO userDAO, final RideSuggestionDAO rideSuggestionDAO,
                           final SharedRideDAO sharedRideDAO, final TokenDAO tokenDAO, final DeviceDAO deviceDAO,
                           final SubscriptionDAO subscriptionDAO) {
@@ -34,14 +40,11 @@ public class RidesharingAPI {
             if (accessControlRequestHeaders != null) {
                 response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
             }
-            String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
-            if (accessControlRequestMethod != null) {
-                response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
-            }
-            return "OK";
+            return "ok";
         });
-
-        Spark.before((request,response)-> response.header("Access-Control-Allow-Origin", "*"));
+        Spark.before((request,response)-> response.header("Content-type", "application/x-www-form-urlencoded"));
+        Spark.before((request,response)-> response.header("Charset", "UTF-8"));
+//        Spark.before((request,response)-> response.header("Access-Control-Allow-Origin", "*"));
 
         post("/createRide", (req, res) -> {
             Hashtable<String, String> createRideResult = new Hashtable<>();
@@ -274,7 +277,7 @@ public class RidesharingAPI {
                 int chatId = requestMessage.getChat().getId();
                 if (requestMessage.getText() == null){
                     sendMessageToTelegram(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
-                    return "OK";
+                    return "ok";
                 }
                 String text = requestMessage.getText().toLowerCase();
 
@@ -292,16 +295,16 @@ public class RidesharingAPI {
                     }
                 } catch (SQLException e) {
                     sendMessageToTelegram(requestMessage.getChat().getId(), TelegramBotResponses.ERROR, getReplyMarkup());
-                    return "OK";
+                    return "ok";
                 }
                 if (text.startsWith("/start") || text.startsWith("/help")) {
                     sendMessageToTelegram(requestMessage.getChat().getId(), TelegramBotResponses.START, getReplyMarkup());
-                    return "OK";
-                }
+                    return "ok";
+                }//done
                 if (text.startsWith("/about")) {
                     sendMessageToTelegram(requestMessage.getChat().getId(), TelegramBotResponses.ABOUT, getReplyMarkup());
-                    return "OK";
-                }
+                    return "ok";
+                }//done
                 if (text.startsWith(TelegramBotResponses.showSymbol + " show") ||text.startsWith("/show") ||
                         text.startsWith("show")) {
                     //sendMessageToTelegram(chatId, "%F0%9F%99%89 I am thinking... Please wait", getReplyMarkup());
@@ -343,22 +346,22 @@ public class RidesharingAPI {
                             sendMessageToTelegram(requestMessage.getChat().getId(), formatGetRidesResponseWithRoute(rideDetails), getReplyMarkup());
                         }
                     }
-                    return "OK";
-                }
+                    return "ok";
+                }//done
                 if (text.startsWith("/create") || text.startsWith("create") ||
                         text.startsWith(TelegramBotResponses.createSymbol + " create") || text.startsWith("new") ||
                         text.startsWith("Еду")) {
                     if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername().equals("")) {
                         sendMessageToTelegram(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     sendMessageToTelegram(chatId, TelegramBotResponses.CREATE_SPECIFY_PARAMETERS, getReplyMarkup());
-                    return "OK";
+                    return "ok";
                 }
                 if (text.startsWith("kazan") || text.startsWith("казань") || text.startsWith("innopolis") || text.startsWith("иннополис")) {
                     if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername().equals("")) {
                         sendMessageToTelegram(requestMessage.getChat().getId(), TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     User user = userDAO.getUserByChatId(chatId);
                     if(user.getLogin()==null ||user.getLogin().equals("")||
@@ -372,13 +375,13 @@ public class RidesharingAPI {
                         user.setFirstName(firstName);
                         if(userDAO.update(chatId, username, firstName,lastName).get("Status").equals("-1")){
                             sendMessageToTelegram(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
-                            return "OK";
+                            return "ok";
                         }
                     }
                     String[] params = text.split(" ");
                     if (params.length > 2 || params.length < 1) {
                         sendMessageToTelegram(chatId, TelegramBotResponses.CREATE_SPECIFY_PARAMETERS, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     RideSuggestion rideSuggestion = new RideSuggestion();
                     if (params[0].toLowerCase().equals("kazan") || params[0].toLowerCase().equals("казань")){
@@ -388,7 +391,7 @@ public class RidesharingAPI {
                     }
                     else {
                         sendMessageToTelegram(chatId, TelegramBotResponses.CREATE_WRONG_CITY, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     int hours;
                     int minutes;
@@ -400,7 +403,7 @@ public class RidesharingAPI {
                             throw new NumberFormatException();
                     } catch (Exception e) {
                         sendMessageToTelegram(chatId, TelegramBotResponses.CREATE_WRONG_TIMEFORMAT, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     rideSuggestion.setRideTime(new Timestamp(getCalendar(hours, minutes).getTime().getTime()));
                     if (rideSuggestion.getDestinationPoint().equals("kazan") || rideSuggestion.getDestinationPoint().equals("казань")) {
@@ -412,13 +415,13 @@ public class RidesharingAPI {
                     rideSuggestion.setFreeSeatsNumber(3);
                     if (user.getId() == 0){
                         logger.error("UserId == 0");
-                        return "OK";
+                        return "ok";
                     }
                     rideSuggestion.setUserId(user.getId());
                     String rideId = rideSuggestionDAO.createRideSuggestion(rideSuggestion).get("RideId");
                     if (rideId == null) {
                         logger.error("rideId == null");
-                        return "OK";
+                        return "ok";
                     }
                     rideSuggestion.setRideSuggestionId(Integer.parseInt(rideId));
                     RideDetails rideDetails = new RideDetails(rideSuggestion, user.getFirstName(), user.getLastName(), user.getLogin());
@@ -426,19 +429,20 @@ public class RidesharingAPI {
                     notification.start();
                     sendMessageToTelegram(requestMessage.getChat().getId(), "%F0%9F%8E%89 You successfully created the ride!" + System.lineSeparator() +
                             formatRideSuggestion(rideSuggestion), getReplyMarkup());
-                    return "OK";
+                    return "ok";
                 }
+                //done
                 //todo notify passengers
                 if (text.startsWith(TelegramBotResponses.cancelSymbol + " cancel") || text.startsWith("/cancel") ||
                         text.startsWith("cancel")){
                     if (requestMessage.getReplyToMessage() == null) {
                         sendMessageToTelegram(chatId, TelegramBotResponses.DELETE_INFO, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     String replyMessage = requestMessage.getReplyToMessage().getText();
                     if (!replyMessage.startsWith("ID")) {
                         sendMessageToTelegram(chatId, TelegramBotResponses.DELETE_INFO, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     int rideId = Integer.parseInt(replyMessage.substring(4, replyMessage.indexOf(System.lineSeparator())));
                     int userId = userDAO.getUserByChatId(chatId).getId();
@@ -446,30 +450,30 @@ public class RidesharingAPI {
                         if (rideSuggestionDAO.exist(rideId, userId)) {
                             if (rideSuggestionDAO.delete(rideId, userId).get("Status").equals("-1")) {
                                 sendMessageToTelegram(chatId, "%F0%9F%90%B5 Sorry, you cannot cancel this ride", getReplyMarkup());
-                                return "OK";
+                                return "ok";
                             }
                         } else {
                             if (sharedRideDAO.delete(rideId, userId) == -1) {
                                 sendMessageToTelegram(chatId, "%F0%9F%90%B5 Sorry, you cannot cancel this ride", getReplyMarkup());
-                                return "OK";
+                                return "ok";
                             }
                         }
                         sendMessageToTelegram(chatId, " %F0%9F%8E%89 You successfully canceled the ride with ID: " + rideId + "! Please, notify your driver or passengers if there are any", getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     } catch (SQLException e) {
                         logger.error(e.getMessage() + " : " + e.getCause()+" : " + e.toString());
-                        return "OK";
+                        return "ok";
                     }
-                }
+                }//done
                 if (text.startsWith(TelegramBotResponses.joinSymbol+" join")|| text.startsWith("join") ||
                         text.startsWith("/join")) {
                     if (requestMessage.getReplyToMessage() == null) {
                         sendMessageToTelegram(chatId, TelegramBotResponses.JOIN_INFO, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     if (requestMessage.getFrom().getUsername() == null || requestMessage.getFrom().getUsername().equals("")) {
                         sendMessageToTelegram(requestMessage.getChat().getId(), TelegramBotResponses.JOIN_PROVIDE_USERNAME, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     String replyMessage = requestMessage.getReplyToMessage().getText();
                     int rideId = Integer.parseInt(replyMessage.substring(4, replyMessage.indexOf(System.lineSeparator())));
@@ -486,17 +490,17 @@ public class RidesharingAPI {
                         user.setFirstName(firstName);
                         if(userDAO.update(chatId, username, firstName,lastName).get("Status").equals("-1")){
                             sendMessageToTelegram(chatId, TelegramBotResponses.CREATE_PROVIDE_USERNAME, getReplyMarkup());
-                            return "OK";
+                            return "ok";
                         }
                     }
                     RideSuggestion rideSuggestion = rideSuggestionDAO.getRideSuggestion(rideId);
                     if (rideSuggestion == null ) {
                         sendMessageToTelegram(requestMessage.getChat().getId(), "%F0%9F%90%B5 I am sorry, this magic ride does not exist", getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     if (rideSuggestion.getUserId() == user.getId()) {
                         sendMessageToTelegram(requestMessage.getChat().getId(), "%F0%9F%90%B5 I am sorry, you cannot join your own ride", getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     sharedRideDAO.joinRide(rideId, user.getId(), 1);
                     //todo
@@ -504,76 +508,71 @@ public class RidesharingAPI {
                     sendMessageToTelegram(requestMessage.getChat().getId(), "%F0%9F%8E%89 You successfully joined the ride with regarded @" + rideDetails.getDriverLogin() + " " + rideDetails.getDriverName() + " " + rideDetails.getDriverLastName(), getReplyMarkup());
                     //todo
                     sendMessageToTelegram(rideDetails.getChatId(), "@" + user.getLogin() + " " + user.getFirstName() + " " + user.getLastName() + " joined your heaven-sent ride!", getReplyMarkup());
-                    return "OK";
+                    return "ok";
                 }
                 //todo add to commands
                 if (text.toLowerCase().startsWith("notify")) {
                     String[] params = text.split(" ");
                     if (params.length != 2) {
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_WRONG_PARAMETERS, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     if(params[1].toLowerCase().equals("on")){
                         User user = userDAO.getUserByChatId(chatId);
                         if(UserNotification.containsUserId(user.getId()) || subscriptionDAO.exist(user.getId()) ){
                             sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
-                            return "OK";
+                            return "ok";
                         }
                         Subscription subscription = new Subscription(user.getId(),chatId, "kazan", "innopolis");
                         int subscriptionId  = Integer.parseInt(subscriptionDAO.createSubscription(subscription).get("SubscriptionId"));
                         subscription.setId(subscriptionId);
                         UserNotification.subscriptionsList.add(subscription);
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     if(params[1].toLowerCase().equals("off")){
                         User user = userDAO.getUserByChatId(chatId);
                         if(!subscriptionDAO.exist(user.getId())){
                             sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_OFF, getReplyMarkup());
-                            return "OK";
+                            return "ok";
                         }
                         subscriptionDAO.delete(user.getId());
                         UserNotification.subscriptionsList.removeIf(p -> p.getUserId()==user.getId());
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_OFF, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     logger.debug("No correct conditions NOTIFY");
-                    return "OK";
+                    return "ok";
                 }
                 if (text.toLowerCase().startsWith("/notify_on")) {
                     User user = userDAO.getUserByChatId(chatId);
                     if(UserNotification.containsUserId(user.getId()) || subscriptionDAO.exist(user.getId()) ){
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     Subscription subscription = new Subscription(user.getId(),chatId, "kazan", "innopolis");
                     int subscriptionId  = Integer.parseInt(subscriptionDAO.createSubscription(subscription).get("SubscriptionId"));
                     subscription.setId(subscriptionId);
                     UserNotification.subscriptionsList.add(subscription);
                     sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_ON, getReplyMarkup());
-                    return "OK";
+                    return "ok";
                 }
                 if (text.toLowerCase().startsWith("/notify_off")){
                     User user = userDAO.getUserByChatId(chatId);
                     if(!subscriptionDAO.exist(user.getId())){
                         sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_OFF, getReplyMarkup());
-                        return "OK";
+                        return "ok";
                     }
                     subscriptionDAO.delete(user.getId());
                     UserNotification.subscriptionsList.removeIf(p -> p.getUserId()==user.getId());
                     sendMessageToTelegram(chatId, TelegramBotResponses.NOTIFY_OFF, getReplyMarkup());
-                    return "OK";
+                    return "ok";
                 }
-
-
-
-
-
                 sendMessageToTelegram(chatId, TelegramBotResponses.ERROR, getReplyMarkup());
-                return "OK";
+                return "ok";
             }catch(Exception e){
                 logger.error(e.getMessage() + " : " + e.getCause()+" : " + e.toString());
-                return "OK";
+                return "ok";
             }
         }, JsonUtil.json());
 
@@ -588,13 +587,15 @@ public class RidesharingAPI {
     }
 
     private Calendar getCalendar(int hours, int minutes) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.set(Calendar.HOUR_OF_DAY, hours);
-        cal.set(Calendar.MINUTE, minutes);
-        if (cal.getTime().before(new Date()))
-            cal.add(Calendar.DAY_OF_MONTH, 1);
-        return cal;
+        //calendar.setTime(new Date());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        Date currentDate = calendar.getTime();
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        if (calendar.getTime().before(currentDate))
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        return calendar;
     }
 
     private boolean isNull(List<String> parameters, spark.Request request){
@@ -623,14 +624,15 @@ public class RidesharingAPI {
 
     private boolean sendMessageToTelegram(int chatId, String message, String replyMarkup){
 //        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
-        String url = "https://api.telegram.org/bot86148492:AAGLv840yestS5KiGODS-K0SZ2OWyp8IJ3c/sendMessage";
+        String url = "https://api.telegram.org/bot86148492:AAGSwyD91W9b-F26ZO1FrONs763yj63lDzE/sendMessage";
         URL obj;
         try {
             obj = new URL(url);
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-//            con.setRequestProperty("content-charset", "UTF-8");//content-charset
+//            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+            con.setRequestProperty("charset", "UTF-8");//content-charset
             String urlParameters = "chat_id=" + chatId + "&text=" + message+"&reply_markup="+replyMarkup;
 
             con.setDoOutput(true);
@@ -650,7 +652,7 @@ public class RidesharingAPI {
         String responseMessage = "";
         responseMessage += "ID: " + rideDetails.getRideSuggestionId() + System.lineSeparator();
         responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
-        responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideDetails.getRideTime()) + System.lineSeparator();
+        responseMessage += "Departure time: " + SIMPLE_DATE_FORMAT.format(rideDetails.getRideTime()) + System.lineSeparator();
         responseMessage += "Driver: " + rideDetails.getDriverName() +" "+ rideDetails.getDriverLastName() + System.lineSeparator();
         //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         return responseMessage;
@@ -659,7 +661,7 @@ public class RidesharingAPI {
         String responseMessage = "";
         responseMessage += "ID: " + rideDetails.getRideSuggestionId() + System.lineSeparator();
         responseMessage += "Route from " + rideDetails.getStartPoint().toUpperCase() +" to "+ rideDetails.getDestinationPoint().toUpperCase() + System.lineSeparator();
-        responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideDetails.getRideTime()) + System.lineSeparator();
+        responseMessage += "Departure time: " + SIMPLE_DATE_FORMAT.format(rideDetails.getRideTime()) + System.lineSeparator();
         responseMessage += "Driver: " + rideDetails.getDriverName() +" "+ rideDetails.getDriverLastName() + System.lineSeparator();
         //responseMessage += "Phone: %2b" + rideDetails.getDriverPhone() + System.lineSeparator();
         return responseMessage;
@@ -667,7 +669,7 @@ public class RidesharingAPI {
     private String formatRideSuggestion(RideSuggestion rideSuggestion){
         String responseMessage = "";
         responseMessage += "ID: " + rideSuggestion.getRideSuggestionId() + System.lineSeparator();
-        responseMessage += "Departure time: " + new SimpleDateFormat("EEEE, dd MMMM HH:mm").format(rideSuggestion.getRideTime()) + System.lineSeparator();
+        responseMessage += "Departure time: " + SIMPLE_DATE_FORMAT.format(rideSuggestion.getRideTime()) + System.lineSeparator();
         responseMessage += "Route from " + rideSuggestion.getStartPoint().toUpperCase() +" to "+ rideSuggestion.getDestinationPoint().toUpperCase() + System.lineSeparator();
         //responseMessage += "Free seats number: " + rideSuggestion.getFreeSeatsNumber() + System.lineSeparator();
         return responseMessage;
