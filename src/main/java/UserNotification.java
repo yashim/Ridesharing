@@ -67,11 +67,11 @@ public class UserNotification implements Runnable {
     }
 
     private static boolean sendPost(int chatId, String message, String replyMarkup){
-//        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
-        String url = "https://api.telegram.org/bot86148492:AAGSwyD91W9b-F26ZO1FrONs763yj63lDzE/sendMessage";
+        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
+//        String url = "https://api.telegram.org/bot86148492:AAGSwyD91W9b-F26ZO1FrONs763yj63lDzE/sendMessage";
         URL obj;
         try {
-            obj = new URL(url);
+            obj = new URL(testUrl);
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");

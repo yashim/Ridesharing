@@ -587,12 +587,24 @@ public class RidesharingAPI {
     }
 
     private Calendar getCalendar(int hours, int minutes) {
-        //calendar.setTime(new Date());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Moscow"));
         Date currentDate = calendar.getTime();
+//        System.out.println(SIMPLE_DATE_FORMAT.format(currentDate.getTime()));
+//        calendar.set(Calendar.HOUR_OF_DAY, 0);
+//        calendar.set(Calendar.MINUTE, 0);
+//        //calendar.set(Calendar.SECOND, 2);
+//        Date newDate = calendar.getTime();
+//        System.out.println(SIMPLE_DATE_FORMAT.format(newDate.getTime()));
+//
+//        calendar.set(Calendar.HOUR_OF_DAY, hours);
+//        calendar.set(Calendar.MINUTE, minutes);
+//        //calendar.set(Calendar.SECOND, 1);
+//        System.out.println(SIMPLE_DATE_FORMAT.format(currentDate.getTime()));
+//
+
         calendar.set(Calendar.HOUR_OF_DAY, hours);
         calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, 0);
         if (calendar.getTime().before(currentDate))
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         return calendar;
@@ -623,11 +635,11 @@ public class RidesharingAPI {
     }
 
     private boolean sendMessageToTelegram(int chatId, String message, String replyMarkup){
-//        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
-        String url = "https://api.telegram.org/bot86148492:AAGSwyD91W9b-F26ZO1FrONs763yj63lDzE/sendMessage";
+        String testUrl = "https://api.telegram.org/bot130322203:AAGk6UAz2WtuBeVqWkv9UPrwXwptgAHPjBg/sendMessage";
+//        String url = "https://api.telegram.org/bot86148492:AAGSwyD91W9b-F26ZO1FrONs763yj63lDzE/sendMessage";
         URL obj;
         try {
-            obj = new URL(url);
+            obj = new URL(testUrl);
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
 //            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
